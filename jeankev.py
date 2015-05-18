@@ -10,9 +10,9 @@
 # Documentation can be found in the "Report" folder  #
 ######################################################
 
-from modules.individualClass import *
 from modules.populationClass import *
 
-
-population = Population('NumberCouple')
-population.runAG()
+choice = int(raw_input("1 OU 2 ??????????"))
+if choice == 1:
+    population = Population('NumberCouple')
+    population.runAG()
