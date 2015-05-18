@@ -39,19 +39,11 @@ class Individual(object):
         pass
 
     @abstractmethod
-    def getBinaryParameters(self):
-        pass
-
-    @abstractmethod
     def getBinaryUnstandardized(self):
         pass
 
     @abstractmethod
     def getRealStandard(self):
-        pass
-
-    @abstractmethod
-    def getRealParameters(self, ):
         pass
 
     @abstractmethod
@@ -62,8 +54,8 @@ class Individual(object):
     def _calculFitness(self):
         pass
 
-    def _binarize(a, size):
-        b = str(bin(a))
+    def _binarize(self, a, size):
+        b = str(bin(int(a)))
         if b[0] == '-':
             b = b[3:]
             b = b.zfill(size)
@@ -74,8 +66,8 @@ class Individual(object):
             b = '+0b' + b
         return b
 
-    def _realize(a, size):
-        b = str(a)
+    def _realize(self, a, size):
+        b = str(int(a))
         if b[0] == '-':
             b = b[1:]
             while len(b) != size:
@@ -129,18 +121,20 @@ class NumberCouple(Individual):
         return result
 
     @staticmethod
-    def getBinaryUnstandardized(self, list):
+    def getBinaryUnstandardized(l):
         key = list()
-        for element in list:
+        print(l)
+        raw_input()
+        for element in l:
             a = int(element, 2)
             a = a / 1000.0
             key.append(a)
         return key
 
     @staticmethod
-    def getRealUnstandardized(self, list):
+    def getRealUnstandardized(l):
         key = list()
-        for element in list:
+        for element in l:
             a = int(element)
             a = a / 1000.0
             key.append(a)

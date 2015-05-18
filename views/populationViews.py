@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 # -*-coding:Utf-8 -*
 
-from os import system
+import os
 
 def setNumberCoupleSettings():
     """

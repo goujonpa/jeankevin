@@ -3,8 +3,8 @@
 
 import views.populationViews as view
 from individualClass import *
-from operator import itemgetter
-from random import randint, uniform
+import operator
+import random
 
 class Population(object):
     """
@@ -18,7 +18,7 @@ class Population(object):
         self._population = []
         self._minFitness = None
         self._maxFitness = None
-        self._settings = self._setSettings()
+        self._settings = self.initSettings()
         self._initialise()
 
     def getIndividualsType(self):
@@ -28,7 +28,7 @@ class Population(object):
         sortedPopulation = sorted(self.getPopulation(), key = operator.itemgetter(1))
         return sortedPopulation[len(sortedPopulation)-1]
 
-    def setSettings(self):
+    def initSettings(self):
         if self.getIndividualsType() == 'NumberCouple':
             return view.setNumberCoupleSettings()
 
@@ -70,7 +70,7 @@ class Population(object):
             for i in range(0, self.getInitialPopulation()):
                 x1 = random.uniform(-2.048, 2.048)
                 x2 = random.uniform(-2.048, 2.048)
-                newIndividual = NumberCouple(x1, x2)
+                newIndividual = NumberCouple((x1, x2))
                 if newIndividual.getFitness() < self.getStopFitness():
                     self._store(newIndividual)
                 else:
@@ -88,7 +88,7 @@ class Population(object):
 
         self._population.append((newIndividual, newIndividual.getFitness()))
 
-        maximalPopulation = self.settings['maximalPopulation']
+        maximalPopulation = self._settings['maximalPopulation']
         if maximalPopulation > 1:
             while (len(self._population) > maximalPopulation): # pops tuple with minimal fitness
                 self._population = sorted(self._population, key = operator.itemgetter(1))
@@ -144,24 +144,24 @@ class Population(object):
         lengths2 = len(parent2.getKey()) # if not == raise exception
         child1 = list()
         child2 = list()
-        for i in range(0, lengths - 1):
+        for i in range(0, lengths1 - 1):
             string1, size1, minCrossPosition1, maxCrossPosition1 = standardParent1[i]
             string2, size2, minCrossPosition2, maxCrossPosition2 = standardParent2[i]
             # if parameters not ==, raise exception
             crosspoint = random.randint(minCrossPosition1, maxCrossPosition1)
             childString1 = string1[0:crosspoint] + string2[crosspoint:]
             childString2 = string2[0:crosspoint] + string1[crosspoint:]
-            childString1 = self._mutate(childString1, size1, minCrossPosition1, maxCrossposition1)
+            childString1 = self._mutate(childString1, size1, minCrossPosition1, maxCrossPosition1)
             childString2 = self._mutate(childString2, size2, minCrossPosition2, maxCrossPosition2)
             child1.append(childString1)
             child2.append(childString2)
 
-        if self.getIndividualsType == 'NumberCouple' and crossmode == 0:
+        if self.getIndividualsType() == 'NumberCouple' and crossmode == 0:
             newChild1 = NumberCouple(NumberCouple.getBinaryUnstandardized(child1))
             result1 = self._store(newChild1)
             newChild2 = NumberCouple(NumberCouple.getBinaryUnstandardized(child2))
             result2 = self._store(newChild2)
-        elif self.getIndividualsType == 'NumberCouple' and crossmode == 1:
+        elif self.getIndividualsType() == 'NumberCouple' and crossmode == 1:
             newChild1 = NumberCouple(NumberCouple.getRealUnstandardized(child1))
             result1 = self._store(newChild1)
             newChild2 = NumberCouple(NumberCouple.getRealUnstandardized(child2))
@@ -169,7 +169,7 @@ class Population(object):
 
         return (result1, result2)
 
-    def _mutate(childString, size, minCrossPosition, maxCrossPosition):
+    def _mutate(self, childString, size, minCrossPosition, maxCrossPosition):
         mutationMode = self.getMutationMode()
         mutationProbability = self.getMutationProbability()
         stringType = self.getIndividualsType()
@@ -190,6 +190,10 @@ class Population(object):
                 pick = random.uniform(0,1)
                 if pick < mutationProbability:
                     if crossmode == 0:
+                        #print(childString)
+                        #print("\n")
+                        #print(i)
+                        raw_input()
                         if childString[i] == '1':
                             char = '0'
                         elif childString[i] == '0':
@@ -210,10 +214,7 @@ class Population(object):
                     char = str(random.randint(0,9))
                 childString = childString[0:i] + char + childString[i+1:]
 
-
-
-
-
+        return childString
 
 
 
