@@ -11,7 +11,7 @@ def setNumberCoupleSettings():
     os.system("clear")
 
     print(
-    	"\n---> NumberCouple Individual\n"
+        "\n---> NumberCouple Individual\n"
         "\n===== OPTIONS =====\n"
     )
     
@@ -27,6 +27,7 @@ def setNumberCoupleSettings():
 
     if preset == 1:
         options["iterations"] = int(1000)
+        options["stopFitness"] = float(0.98)
         options["crosspoint"] = int(111)
         options["crossmode"] = int(0)
         options["maximalPopulation"] = int(20)
