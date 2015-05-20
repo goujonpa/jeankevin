@@ -133,7 +133,7 @@ class Population(object):
         else:
             return 1
 
-    def runAG(self):
+    def run_GA(self):
         result = (1, 1)
         i = 0
 
@@ -178,12 +178,13 @@ class Population(object):
         crossmode = self.crossmode
         view['0- PARENT 1'] = parent1.key
         view['0- PARENT 2'] = parent2.key
+
         if crossmode == 0:
-            standardParent1 = parent1.getBinaryStandard()
-            standardParent2 = parent2.getBinaryStandard()
+            standardParent1 = parent1.get_binary_standard()
+            standardParent2 = parent2.get_binary_standard()
         elif crossmode == 1:
-            standardParent1 = parent1.getRealStandard()
-            standardParent2 = parent2.getRealStandard()
+            standardParent1 = parent1.get_real_standard()
+            standardParent2 = parent2.get_real_standard()
 
         view["1- STANDARDIZED PARENT 1"] = standardParent1
         view["1- STANDARDIZED PARENT 2"] = standardParent2
@@ -215,16 +216,16 @@ class Population(object):
             child2.append(childString2)
 
         if self.getIndividualsType() == 'NumberCouple' and crossmode == 0:
-            child1 = NumberCouple.getBinaryUnstandardized(child1)
+            child1 = NumberCouple.get_binary_unstandardized(child1)
             newChild1 = NumberCouple(child1)
             result1 = self._store(newChild1)
-            child2 = NumberCouple.getBinaryUnstandardized(child2)
+            child2 = NumberCouple.get_binary_unstandardized(child2)
             newChild2 = NumberCouple(child2)
             result2 = self._store(newChild2)
         elif self.getIndividualsType() == 'NumberCouple' and crossmode == 1:
-            newChild1 = NumberCouple(NumberCouple.getRealUnstandardized(child1))
+            newChild1 = NumberCouple(NumberCouple.get_real_unstandardized(child1))
             result1 = self._store(newChild1)
-            newChild2 = NumberCouple(NumberCouple.getRealUnstandardized(child2))
+            newChild2 = NumberCouple(NumberCouple.get_real_unstandardized(child2))
             result2 = self._store(newChild2)
 
         view['6- UNSTANDARDIZED CHILD 1'] = child1

@@ -16,13 +16,13 @@ class NumberCouple(Individual):
     def __init__(self, key):
         super(NumberCouple, self).__init__(key)
 
-    def _calculFitness(self):
+    def _calcul_fitness(self):
             x1, x2 = self._key
             functionResult = 100 * pow((x2 - pow(x1, 2)), 2) + pow((x1 - 1), 2)
             fitness = 1.0 / (1 + functionResult)
             return fitness
 
-    def getBinaryStandard(self):
+    def get_binary_standard(self):
         x1, x2 = self.getKey()
         x1 = 1000 * x1
         x2 = 1000 * x2
@@ -31,7 +31,7 @@ class NumberCouple(Individual):
         result.append((self._binarize(x2, 12), 15, 3, 14))
         return result
 
-    def getRealStandard(self):
+    def get_real_standard(self):
         x1, x2 = self.getKey()
         x1 = 1000 * x1
         x2 = 1000 * x2
@@ -41,7 +41,7 @@ class NumberCouple(Individual):
         return result
 
     @staticmethod
-    def getBinaryUnstandardized(l):
+    def get_binary_unstandardized(l):
         key = list()
         for element in l:
             a = int(element, 2)
@@ -50,7 +50,7 @@ class NumberCouple(Individual):
         return key
 
     @staticmethod
-    def getRealUnstandardized(l):
+    def get_real_unstandardized(l):
         key = list()
         for element in l:
             a = int(element)

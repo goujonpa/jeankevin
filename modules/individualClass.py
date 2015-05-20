@@ -17,7 +17,7 @@ class Individual(object):
         """
         super(Individual, self).__init__()
         self.key = key
-        self._fitness = float(self._calculFitness())
+        self._fitness = float(self._calcul_fitness())
 
     @property
     def key(self):
@@ -26,7 +26,7 @@ class Individual(object):
     @key.setter
     def key(self, value):
         self._key = value
-        self._fitness = self._calculFitness()
+        self._fitness = self._calcul_fitness()
 
     @property
     def fitness(self):
@@ -34,26 +34,26 @@ class Individual(object):
 
     @fitness.setter
     def fitness(self, value):
-        self._fitness = self._calculFitness()
+        self._fitness = self._calcul_fitness()
 
     @abstractmethod
-    def getBinaryStandard(self):
+    def get_binary_standard(self):
         pass
 
     @abstractmethod
-    def getBinaryUnstandardized(self):
+    def get_binary_unstandardized(self):
         pass
 
     @abstractmethod
-    def getRealStandard(self):
+    def get_real_standard(self):
         pass
 
     @abstractmethod
-    def getRealUnstandardized(self):
+    def get_real_unstandardized(self):
         pass
 
     @abstractmethod
-    def _calculFitness(self):
+    def _calcul_fitness(self):
         pass
 
     def _binarize(self, a, size):

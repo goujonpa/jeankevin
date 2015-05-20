@@ -13,7 +13,7 @@
 
 from modules.populationClass import *
 
-choice = int(raw_input("1 OU 2 ??????????"))
+choice = int(raw_input("1 OU 2 ?"))
 if choice == 1:
     population = Population('NumberCouple')
-    population.runAG()
+    population.run_GA()
