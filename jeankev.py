@@ -4,6 +4,7 @@
 ######################################################
 # Jean Kevin                                         #
 # Python application                                 #
+# Conformance to PEP 8 !                             #
 # Implementation proposition for Genetic Algorithms  #
 # School Project developped by Paul GOUJON, 2015     #
 #                                                    #
