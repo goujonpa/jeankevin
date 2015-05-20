@@ -5,25 +5,21 @@ from modules.individualClass import Individual
 
 
 class NumberCouple(Individual):
-    """
-    docstring for NumberCouple
-    inherits from Individual
+    """NumberCouple class
+    Inherits from Individual class
 
     Attributes:
     _key : is a list(x1, x2)
     _fitness : = 1/1+f(x) with f(x) = 100(x2 - x1^2)^2 + (x1 - 1)^2
-    
-    Methods:
-    getKey()
-    getFitness()
-    _calculFitness : calculates the fitness value
+
     """
     def __init__(self, key):
         super(NumberCouple, self).__init__(key)
 
     def _calculFitness(self):
             x1, x2 = self._key
-            fitness = 1.0 / (1 + (100 * pow((x2 - pow(x1,2)),2) + pow((x1 - 1),2)))
+            functionResult = 100 * pow((x2 - pow(x1, 2)), 2) + pow((x1 - 1), 2)
+            fitness = 1.0 / (1 + functionResult)
             return fitness
 
     def getBinaryStandard(self):

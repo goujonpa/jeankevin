@@ -3,20 +3,11 @@
 
 from abc import ABCMeta, abstractmethod
 
+
 class Individual(object):
-    """
-    docstring for Individual
-    abstract class
+    """Individual Class
 
-    attributes:
-    _key
-    _fitness
-
-    methods:
-    getKey()
-    getFitness()
-    _calculFitness() : abstract method
-
+    Abstract class representing an individual
     """
     __metaclass__ = ABCMeta
 
@@ -25,14 +16,25 @@ class Individual(object):
         initialise with "Individual(key)"
         """
         super(Individual, self).__init__()
-        self._key = key
-        self._fitness = self._calculFitness()
+        self.key = key
+        self._fitness = float(self._calculFitness())
 
-    def getKey(self):
+    @property
+    def key(self):
         return self._key
 
-    def getFitness(self):
+    @key.setter
+    def key(self, value):
+        self._key = value
+        self._fitness = self._calculFitness()
+
+    @property
+    def fitness(self):
         return self._fitness
+
+    @fitness.setter
+    def fitness(self, value):
+        self._fitness = self._calculFitness()
 
     @abstractmethod
     def getBinaryStandard(self):
