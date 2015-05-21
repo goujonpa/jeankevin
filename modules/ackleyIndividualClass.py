@@ -2,6 +2,8 @@
 # -*-coding:Utf-8 -*
 
 from modules.individualClass import Individual
+import math
+import random
 
 
 class AckleyIndividual(Individual):
@@ -13,47 +15,77 @@ class AckleyIndividual(Individual):
     _fitness : = 1/1+f(x) with f(x) = 100(x2 - x1^2)^2 + (x1 - 1)^2
 
     """
-    def __init__(self, key):
-        super(NumberCouple, self).__init__(key)
+    def __init__(self, key=None):
+        super(AckleyIndividual, self).__init__(key)
+        self._dimension = int(30)
+        self._c1 = float(20)
+        self._c2 = float(0.2)
+        self._c3 = float(2.0 * 3.14159)
 
     def _calcul_fitness(self):
-            x1, x2 = self._key
-            functionResult = 100 * pow((x2 - pow(x1, 2)), 2) + pow((x1 - 1), 2)
-            fitness = 1.0 / (1 + functionResult)
-            return fitness
+        calcul = 0.0
+        calcul2 = 0.0
+        agregat = 0.0
+        c1 = self.c1
+        c2 = self.c2
+        c3 = self.c3
+        dimension = self.dimension
+
+        for i in range(0, dimension):
+            agregat += pow(key[i][0], 2)
+        calcul += float(1.0 / float(dimension)) * float(agregat)
+        calcul = float(sqrt(calcul))
+        calcul = float(-c2 * calcul)
+        calcul = float(exp(calcul))
+        calcul = float(-c1 * calcul)
+
+        agregat = 0.0
+        for i in range(0, dimension):
+            a = float(c3 * key[i][0])
+            agregat += float(cos(a))
+        calcul2 = float(1.0 / float(dimension))
+        calcul2 = float(-1 * exp(calcul2))
+
+        agregat = float(calcul) + float(calcul2) + float(c1) + float(exp(1))  # is fitness motherfucker
+        return float(agregat)
+
+    def _random_initialisation(self):
+        key = list()
+        for i in range(0, self.dimension):
+            random_real = random.uniform(-15, 15)
+            key.append((random_real, 'ackley_x'))
+
+        for i in range(0, self.dimension):
+            random_real = random.uniform(0, 10)
+            key.append((random_real, 'ackley_sigma'))
+        return key
+
+    @property
+    def dimension(self):
+        return self._dimension
+
+    @property
+    def c3(self):
+        return self._c3
+
+    @property
+    def c1(self):
+        return self._c1
+
+    @property
+    def c2(self):
+        return self._c2
 
     def get_binary_standard(self):
-        x1, x2 = self.getKey()
-        x1 = 1000 * x1
-        x2 = 1000 * x2
-        result = []
-        result.append((self._binarize(x1, 12), 15, 3, 14))
-        result.append((self._binarize(x2, 12), 15, 3, 14))
-        return result
+        return None
 
     def get_real_standard(self):
-        x1, x2 = self.getKey()
-        x1 = 1000 * x1
-        x2 = 1000 * x2
-        result = []
-        result.append((self._realize(x1, 12), 13, 9, 12))
-        result.append((self._realize(x2, 12), 13, 9, 12))
-        return result
+        return None
 
     @staticmethod
     def get_binary_unstandardized(l):
-        key = list()
-        for element in l:
-            a = int(element, 2)
-            a = a / 1000.0
-            key.append(a)
-        return key
+        return None
 
     @staticmethod
     def get_real_unstandardized(l):
-        key = list()
-        for element in l:
-            a = int(element)
-            a = a / 1000.0
-            key.append(a)
-        return key
+        return None

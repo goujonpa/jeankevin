@@ -2,6 +2,7 @@
 # -*-coding:Utf-8 -*
 
 import os
+import math
 
 
 def set_NCpl_settings():
@@ -121,12 +122,8 @@ def set_AklI_settings():
         options["iterations"] = int(100)
         options["stopFitness"] = float(0.98)
         options["base"] = int(4)
-        options["crossmode"] = int(0)
-        options["maximalPopulation"] = int(20)
-        options["mutationMode"] = int(1)
-        options["mutationProbability"] = float(2)
-        options["verbose"] = int(0)
-        options["initialPopulation"] = int(1000)
+        options['verbose'] = int(1)
+        options['maximalPopulation'] = int(8)
 
     elif preset == 2:
         print("\nBASICS")
@@ -144,6 +141,11 @@ def set_AklI_settings():
             "t (global step size) = 1 / (n)^(1/2)\n"
             "ti (component step size) = 1 / (n)^(1/4)\n"
         ))
+
+        options['maximalPopulation'] = 2 * options['base']
+        options['childNumber'] = 8 * options['base']
+        options['globalLearningTax'] = 1.0 / pow(options['base'], 0.5)
+        options['localLearningTax'] = 1.0 / pow(options['base'], 0.25)
 
         print("\nVERBOSE")
         options["verbose"] = int(raw_input(

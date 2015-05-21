@@ -7,6 +7,7 @@ from views import settingsView as vSet
 from modules.numberCoupleClass import NumberCouple
 import operator
 import random
+import math
 
 
 class Population(object):
@@ -26,6 +27,22 @@ class Population(object):
     @property
     def individuals_type(self):
         return self._individuals_type
+
+    @property
+    def child_number(self):
+        return self._settings['childNumber']
+
+    @property
+    def maximal_population(self):
+        return self._settings['maximalPopulation']
+
+    @property
+    def global_learning_tax(self):
+        return self._settings['globalLearningTax']
+
+    @property
+    def local_learning_tax(self):
+        return self._settings['localLearningTax']
 
     @property
     def settings(self):
@@ -98,7 +115,8 @@ class Population(object):
                 else:
                     i = i - 1
         elif self.individuals_type == 'AckleyIndividual':
-            return None
+            adam = AckleyIndividual()
+            result = store(adam)
 
     def _store(self, newIndividual):
         view = dict()
@@ -119,7 +137,7 @@ class Population(object):
         self._population.append((newIndividual, newIndividual.fitness))
         view["ADDED"] = "{} added, fitness = {}".format(newIndividual.key, newIndividual.fitness)
 
-        maximalPopulation = self._settings['maximalPopulation']
+        maximalPopulation = self.maximal_population
         if maximalPopulation > 1:
             while (len(self._population) > maximalPopulation):  # pops tuple with minimal fitness
                 self._population = sorted(self._population, key=operator.itemgetter(1))
@@ -133,6 +151,9 @@ class Population(object):
             return newIndividual
         else:
             return 1
+
+    def _empty_population(self):
+        self._population = list()
 
     def run_GA(self):
         result = (1, 1)
@@ -304,4 +325,28 @@ class Population(object):
             # (x, s) vector de solutions = recombination de  (p séléctionnés parmi la population P)
 
         # recombination choisie : discrete... on verra pour la intermediate/weighted plus tard
+
+        # Initialisation done by initialise()
+        self._mutation_SA()  # Self-adapted
         return None
+
+    def _mutation_SA():
+        individual = self.population[0]
+        vector_size = len(individual.key)/2
+
+        for i in range(0, self.child_number):
+            global_step_size = float(self.global_learning_tax * random.gauss(0, 1))
+            for j in range(0, vector_size):
+                list_sigma = list()
+                list_xi = list()
+                local_step_size = float(self.local_learning_tax * random.gauss(0, 1))
+                zk = float(random.gauss(0, 1))
+                sigma = float(individual.key[30+j][0])
+                sigma = float(sigma) * float(exp(local_step_size)) * float(exp(global_step_size))
+                list_sigma.append((sigma, 'ackley_sigma'))
+                xi = individual.key[j][0] + float(sigma * zk)
+                list_xi.append((xi, 'ackley_x'))
+            new_key = list_xi + list_sigma
+            new_individual = AckleyIndividual(new_key)
+            result = store(new_individual)
+        return 1

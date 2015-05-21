@@ -11,7 +11,7 @@ class Individual(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, key):
+    def __init__(self, key=None):
         """
         initialise with "Individual(key)"
         """
