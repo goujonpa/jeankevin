@@ -326,10 +326,29 @@ class Population(object):
 
         # recombination choisie : discrete... on verra pour la intermediate/weighted plus tard
 
-
         # Initialisation done by initialise()
         self._mutation_SA()  # Self-adapted
+        self._recombination_SA()
         return None
+
+    def _recombination_SA():
+        population = self.population
+        population_size = self.population_size
+        key_length = len(individual.key)
+        new_key = list()
+        for (individual, fitness) in population:
+            for i in range(0, key_length):
+                if len(new_key) <= i and i < (key_length / 2):
+                    new_key.append((individual.key[i][0], 'ackley_x'))
+                elif len(new_key) <= i:
+                    new_key.append((individual.key[i][0], 'ackley_sigma'))
+                else:
+                    new_key[i][0] += individual.key[i][0]
+        new_key = [(x / population_size, y) for (x, y) in new_key]
+        new_father = AckleyIndividual(new_key)
+        self._empty_population()
+        result = store(new_father)
+        return result
 
     def _mutation_SA():
         individual = self.population[0]
