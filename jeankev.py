@@ -17,3 +17,6 @@ choice = int(raw_input("1 OU 2 ?"))
 if choice == 1:
     population = Population('NumberCouple')
     population.run_GA()
+elif choice == 2:
+    population = Population('AckleyIndividual')
+    population.run_ES()

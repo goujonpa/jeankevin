@@ -16,8 +16,15 @@ class Individual(object):
         initialise with "Individual(key)"
         """
         super(Individual, self).__init__()
-        self.key = key
+        if key is not None:
+            self.key = key
+        else:
+            self.key = self._random_initialisation()
         self._fitness = float(self._calcul_fitness())
+
+    @abstractmethod
+    def _random_initialisation(self):
+        pass
 
     @property
     def key(self):

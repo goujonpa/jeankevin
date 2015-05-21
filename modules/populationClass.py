@@ -5,7 +5,6 @@ from views import displayView as vDisp
 from views import clearView as vClr
 from views import settingsView as vSet
 from modules.numberCoupleClass import NumberCouple
-from modules.AGParametersSetClass import AGParametersSet
 import operator
 import random
 
@@ -15,18 +14,18 @@ class Population(object):
     docstring for Population
     """
 
-    def __init__(self, individualsType):
+    def __init__(self, individuals_type):
         super(Population, self).__init__()
-        self.individualsType = individualsType
-        self.settings = self._initSettings()
+        self._individuals_type = individuals_type
+        self._settings = self._initSettings()
         self._worst = None
         self._best = None
         self._population = self._initialise()
         raw_input()
 
     @property
-    def individualsType(self):
-        return self._individualsType
+    def individuals_type(self):
+        return self._individuals_type
 
     @property
     def settings(self):
@@ -37,8 +36,10 @@ class Population(object):
         return self._best
 
     def _initSettings(self):
-        if self.individualsType() == 'NumberCouple':
-            return vSet.setSettings()
+        if self.individuals_type == 'NumberCouple':
+            return vSet.set_NCpl_settings()
+        elif self.individuals_type == 'AckleyIndividual':
+            return vSet.set_AklI_settings()
 
     @property
     def verbose(self):
@@ -89,15 +90,15 @@ class Population(object):
         return self._settings['crossmode']
 
     def _initialise(self):  # could be more generic
-        if self.getIndividualsType() == 'NumberCouple':
+        if self.individuals_type == 'NumberCouple':
             for i in range(0, self.initial_population):
-                x1 = random.uniform(-2.048, 2.048)
-                x2 = random.uniform(-2.048, 2.048)
-                newIndividual = NumberCouple((x1, x2))
+                newIndividual = NumberCouple()
                 if newIndividual.fitness < self.stop_fitness:
                     self._store(newIndividual)
                 else:
                     i = i - 1
+        elif self.individuals_type == 'AckleyIndividual':
+            return None
 
     def _store(self, newIndividual):
         view = dict()
@@ -215,14 +216,14 @@ class Population(object):
             child1.append(childString1)
             child2.append(childString2)
 
-        if self.getIndividualsType() == 'NumberCouple' and crossmode == 0:
+        if self.individuals_type == 'NumberCouple' and crossmode == 0:
             child1 = NumberCouple.get_binary_unstandardized(child1)
             newChild1 = NumberCouple(child1)
             result1 = self._store(newChild1)
             child2 = NumberCouple.get_binary_unstandardized(child2)
             newChild2 = NumberCouple(child2)
             result2 = self._store(newChild2)
-        elif self.getIndividualsType() == 'NumberCouple' and crossmode == 1:
+        elif self.individuals_type == 'NumberCouple' and crossmode == 1:
             newChild1 = NumberCouple(NumberCouple.get_real_unstandardized(child1))
             result1 = self._store(newChild1)
             newChild2 = NumberCouple(NumberCouple.get_real_unstandardized(child2))
@@ -238,7 +239,7 @@ class Population(object):
     def _mutate(self, childString, size, minCrossPosition, maxCrossPosition):
         mutationMode = self.mutation_mode
         mutationProbability = self.mutation_probability
-        stringType = self.getIndividualsType()
+        stringType = self.individuals_type
         crossmode = self.crossmode
 
         if mutationProbability > 1:
@@ -280,3 +281,27 @@ class Population(object):
                 childString = childString[0:i] + char + childString[i+1:]
 
         return childString
+
+    def run_ES():
+        # given n , p , mu, lambda, appartenant a N+
+        # tant que non satisfait
+            # pour tout k (individu appartenant a la pop)
+                # (xk, sk) vector de solutions = recombination de  (p séléctionnés parmi la population P)
+                # sk' paramètre de strategy = mutation du paramètre de strategy sk
+                # xk'  = mutation vecteur solution en fonction du paramètre sk
+            # P = P + new childs
+            # P = select_by_age truc
+            # P = select_mu_best
+
+        # given n , lambda, appartenant a N+
+        # x appartient a  R(n) , s, P = dict
+        # tant que non satisfait
+            # pour tout lambda, soit nombre de la pop d'enfant
+                # sk paramètre de strategy = mutation du paramètre de strategy s
+                # xk  = mutation de x du paramètre sk
+                # P = P + new childs
+            # P = select_by_age truc
+            # (x, s) vector de solutions = recombination de  (p séléctionnés parmi la population P)
+
+        # recombination choisie : discrete... on verra pour la intermediate/weighted plus tard
+        return None

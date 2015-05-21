@@ -13,8 +13,13 @@ class NumberCouple(Individual):
     _fitness : = 1/1+f(x) with f(x) = 100(x2 - x1^2)^2 + (x1 - 1)^2
 
     """
-    def __init__(self, key):
+    def __init__(self, key=None):
         super(NumberCouple, self).__init__(key)
+
+    def _random_initialisation(self):
+        x1 = random.uniform(-2.048, 2.048)
+        x2 = random.uniform(-2.048, 2.048)
+        return (x1, x2)
 
     def _calcul_fitness(self):
             x1, x2 = self._key

@@ -1,13 +1,10 @@
 #!/usr/local/bin/python
 # -*-coding:Utf-8 -*
 
+import os
 
-def setSettings():
-    """
-    set every useful options for the execution
-    """
 
-    import os
+def set_NCpl_settings():
 
     os.system("clear")
 
@@ -95,6 +92,65 @@ def setSettings():
 
         print("\n===== POPULATION INITIALISATION =====\n")
         options["initialPopulation"] = int(raw_input("\nInitialise with how much individuals ?\n"))
+        os.system("clear")
+
+    return options
+
+
+def set_AklI_settings():
+
+    os.system("clear")
+
+    print(
+        "\n---> Ackley Function Individual\n"
+        "\n===== OPTIONS =====\n"
+    )
+
+    options = {}
+
+    preset = int(raw_input(
+        "PRESET\n"
+        "Use preset ?\n"
+        "\n\n-> 1: Source based preset\n"
+        "\n-> 2: I WANT TO SET BY MYSELF\n"
+    ))
+
+    os.system("clear")
+
+    if preset == 1:
+        options["iterations"] = int(100)
+        options["stopFitness"] = float(0.98)
+        options["base"] = int(4)
+        options["crossmode"] = int(0)
+        options["maximalPopulation"] = int(20)
+        options["mutationMode"] = int(1)
+        options["mutationProbability"] = float(2)
+        options["verbose"] = int(0)
+        options["initialPopulation"] = int(1000)
+
+    elif preset == 2:
+        print("\nBASICS")
+        x = int(raw_input("Stop Iterations Number:\n"))
+        options["iterations"] = int(x) - 1
+
+        options['stopFitness'] = float(raw_input("\nStop Fitness:\n"))
+
+        print("\nGENERATIONS")
+
+        options["base"] = int(raw_input(
+            "n setting:\n"
+            "lambda (number of child from the father) = 8 * n\n"
+            "mu (number of best child selected to make new father) = lambda / 4\n"
+            "t (global step size) = 1 / (n)^(1/2)\n"
+            "ti (component step size) = 1 / (n)^(1/4)\n"
+        ))
+
+        print("\nVERBOSE")
+        options["verbose"] = int(raw_input(
+            "Verbose Mode\n"
+            "-> 1: Enabled\n"
+            "-> 0: Disabled\n"
+        ))
         os.system("clear")
 
     return options
