@@ -1,7 +1,9 @@
 #!/usr/local/bin/python
 # -*-coding:Utf-8 -*
 
-import views as v
+import views.displayView as v
+import views.saveFigure as vSave
+import views.settingsView as vSet
 from modules.numberCoupleClass import NumberCouple
 from modules.ackleyIndividualClass import AckleyIndividual
 import operator
@@ -137,6 +139,16 @@ class Population(object):
     def crossmode(self):
         return self._settings['crossmode']
 
+    @property
+    def selection_mode(self):
+        return self._settings['selectionMode']
+
+    def enable_verbose(self):
+        self._settings['verbose'] = int(1)
+
+    def disable_verbose(self):
+        self._settings['verbose'] = int(0)
+
     # ----- View
 
     @property
@@ -164,6 +176,7 @@ class Population(object):
     # ========== GA & ES Algorithms ==========
 
     def _initialise(self):  # could be more generic
+        self.disable_verbose()
         if self.individuals_type == 'NumberCouple':
             for i in range(0, self.initial_population):
                 newIndividual = NumberCouple()
@@ -174,6 +187,7 @@ class Population(object):
         elif self.individuals_type == 'AckleyIndividual':
             adam = AckleyIndividual()
             result = self._store(adam)
+        self.enable_verbose()
 
     def run_ES(self):
         # Initialisation done by initialise()
@@ -194,7 +208,7 @@ class Population(object):
 
         best = self.best
         print("\n\nBest:\n{} : fitness = {}".format(best.key, best.fitness))
-        vSv.save_figure(self._save_iterations, self._save_fitness_sums, self._save_maximums, 'simuES')
+        vSave.save_figure(self._save_iterations, self._save_fitness_sums, self._save_maximums, 'simuES')
 
         return 1
 
@@ -217,7 +231,7 @@ class Population(object):
 
         best = self.best
         print("\n\nBest:\n{} : fitness = {}".format(best.key, best.fitness))
-        vSv.save_figure(self._save_iterations, self._save_fitness_sums, self._save_maximums, 'simuGA')
+        vSave.save_figure(self._save_iterations, self._save_fitness_sums, self._save_maximums, 'simuGA')
 
         return 1
 
@@ -314,9 +328,6 @@ class Population(object):
 
         self.addview('2- Length #1', length1)
         self.addview('2- Length #2', length2)
-
-        view["2- LENGTH 1"] = length1
-        view["2- LENGTH 2"] = length2
 
         child1 = list()
         child2 = list()

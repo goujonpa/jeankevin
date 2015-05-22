@@ -33,8 +33,9 @@ def set_NCpl_settings():
         options["maximalPopulation"] = int(20)
         options["mutationMode"] = int(1)
         options["mutationProbability"] = float(2)
-        options["verbose"] = int(0)
+        options["verbose"] = int(1)
         options["initialPopulation"] = int(50)
+        options['selectionMode'] = int(1)
 
     elif preset == 2:
         print("\nBASICS")
@@ -123,6 +124,7 @@ def set_AklI_settings():
         options["stopFitness"] = float(0.80)
         options["base"] = int(8)
         options['verbose'] = int(1)
+        options['selectionMode'] = int(1)
 
     elif preset == 2:
         print("\nBASICS")
