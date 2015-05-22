@@ -9,6 +9,7 @@ from modules.ackleyIndividualClass import AckleyIndividual
 import operator
 import random
 import math
+import os
 
 
 class Population(object):
@@ -188,6 +189,7 @@ class Population(object):
             adam = AckleyIndividual()
             result = self._store(adam)
         self.enable_verbose()
+        os.system('clear')
 
     def run_ES(self):
         # Initialisation done by initialise()
@@ -223,7 +225,13 @@ class Population(object):
             self._current_iteration = i
             parent1 = self._selectOne()
             parent2 = self._selectOne()
+
             result = self._cross(parent1, parent2)
+
+            result1 = self._store(result[0])
+            result2 = self._store(result[1])
+            result = (result1, result2)
+
             i = i + 1
             self._save_iterations.append(i)
             self._save_fitness_sums.append(self.fitness_sums)
@@ -277,7 +285,7 @@ class Population(object):
             return self._tournament_selection()
 
     def _roulette_selection(self):
-        self.empty_view
+        self.empty_view()
         self.addview('title', 'SELECTION BY ROULETTE WHEEL')
 
         positionList = list()
@@ -332,7 +340,7 @@ class Population(object):
         child1 = list()
         child2 = list()
 
-        for i in range(0, lengths1):
+        for i in range(0, length1):
             string1, size1, minCrossPosition1, maxCrossPosition1 = standardParent1[i]
             string2, size2, minCrossPosition2, maxCrossPosition2 = standardParent2[i]  # if not equals, exception
 
@@ -362,22 +370,18 @@ class Population(object):
         if self.individuals_type == 'NumberCouple' and crossmode == 0:
             child1 = NumberCouple.get_binary_unstandardized(child1)
             newChild1 = NumberCouple(child1)
-            result1 = self._store(newChild1)
             child2 = NumberCouple.get_binary_unstandardized(child2)
             newChild2 = NumberCouple(child2)
-            result2 = self._store(newChild2)
         elif self.individuals_type == 'NumberCouple' and crossmode == 1:
             newChild1 = NumberCouple(NumberCouple.get_real_unstandardized(child1))
-            result1 = self._store(newChild1)
             newChild2 = NumberCouple(NumberCouple.get_real_unstandardized(child2))
-            result2 = self._store(newChild2)
 
         self.addview('6- Unstandardized Child #1', child1)
         self.addview('6- Unstandardized Child #2', child2)
 
         self.display()
 
-        return (result1, result2)
+        return (newChild1, newChild2)
 
     def _mutate(self, childString, size, minCrossPosition, maxCrossPosition):  # Add display !!!
         mutationMode = self.mutation_mode
