@@ -4,7 +4,9 @@
 from views import displayView as vDisp
 from views import clearView as vClr
 from views import settingsView as vSet
+from views import saveFigure as vSv
 from modules.numberCoupleClass import NumberCouple
+from modules.ackleyIndividualClass import AckleyIndividual
 import operator
 import random
 import math
@@ -21,6 +23,10 @@ class Population(object):
         self._settings = self._initSettings()
         self._worst = None
         self._best = None
+        self._save_iterations = list()
+        self._save_maximums = list()
+        self._save_fitness_sums = list()
+        self._population = list()
         self._population = self._initialise()
         raw_input()
 
@@ -35,6 +41,14 @@ class Population(object):
     @property
     def maximal_population(self):
         return self._settings['maximalPopulation']
+
+    @property
+    def fitness_sums(self):
+        population = self.population
+        sums = 0.0
+        individuals, values = zip(*population)
+        sums = sum(values)
+        return sums
 
     @property
     def global_learning_tax(self):
@@ -94,6 +108,10 @@ class Population(object):
             return None
         return self._best.fitness
 
+    def _empty_extrems(self):
+        self._best = None
+        self._worst = None
+
     @property
     def mutation_mode(self):
         return self._settings['mutationMode']
@@ -116,7 +134,8 @@ class Population(object):
                     i = i - 1
         elif self.individuals_type == 'AckleyIndividual':
             adam = AckleyIndividual()
-            result = store(adam)
+            result = self._store(adam)
+            return self.population
 
     def _store(self, newIndividual):
         view = dict()
@@ -137,17 +156,16 @@ class Population(object):
         self._population.append((newIndividual, newIndividual.fitness))
         view["ADDED"] = "{} added, fitness = {}".format(newIndividual.key, newIndividual.fitness)
 
-        maximalPopulation = self.maximal_population
-        if maximalPopulation > 1:
-            while (len(self._population) > maximalPopulation):  # pops tuple with minimal fitness
-                self._population = sorted(self._population, key=operator.itemgetter(1))
+        if self.maximal_population >= 1:
+            while (self.population_size > self.maximal_population):  # pops tuple with minimal fitness
+                self._population = sorted(self.population, key=operator.itemgetter(1))
                 poped = self._population.pop(0)
                 self._worst = self._population[0][0]
                 view['POP'] = "{} is poped".format(poped[0].key)
 
         vDisp.dDisplay(view, self.verbose)
 
-        if newIndividual.fitness > self._settings['stopFitness']:
+        if newIndividual.fitness > self.stop_fitness:
             return newIndividual
         else:
             return 1
@@ -303,70 +321,61 @@ class Population(object):
 
         return childString
 
-    def run_ES():
-        # given n , p , mu, lambda, appartenant a N+
-        # tant que non satisfait
-            # pour tout k (individu appartenant a la pop)
-                # (xk, sk) vector de solutions = recombination de  (p séléctionnés parmi la population P)
-                # sk' paramètre de strategy = mutation du paramètre de strategy sk
-                # xk'  = mutation vecteur solution en fonction du paramètre sk
-            # P = P + new childs
-            # P = select_by_age truc
-            # P = select_mu_best
-
-        # given n , lambda, appartenant a N+
-        # x appartient a  R(n) , s, P = dict
-        # tant que non satisfait
-            # pour tout lambda, soit nombre de la pop d'enfant
-                # sk paramètre de strategy = mutation du paramètre de strategy s
-                # xk  = mutation de x du paramètre sk
-                # P = P + new childs
-            # P = select_by_age truc
-            # (x, s) vector de solutions = recombination de  (p séléctionnés parmi la population P)
-
-        # recombination choisie : discrete... on verra pour la intermediate/weighted plus tard
-
+    def run_ES(self):
         # Initialisation done by initialise()
-        self._mutation_SA()  # Self-adapted
-        self._recombination_SA()
-        return None
+        i = 0
+        while i < self.stop_iteration and self.population[0][1] < self.stop_fitness:
+            self._save_iterations.append(i)
+            self._save_fitness_sums.append(self.fitness_sums)
+            self._save_maximums.append(self.best.fitness)
+            self._mutation_SA()  # Self-adapted
+            j = i + 0.5
+            self._save_iterations.append(j)
+            self._save_fitness_sums.append(self.fitness_sums)
+            self._save_maximums.append(self.best.fitness)
+            self._recombination_SA()
+            i += 1
+        vSv.save_figure(self._save_iterations, self._save_fitness_sums, self._save_maximums, 'simuES')
+        return 1
 
-    def _recombination_SA():
+    def _recombination_SA(self):
         population = self.population
         population_size = self.population_size
-        key_length = len(individual.key)
+        key_length = len(population[0][0].key)
         new_key = list()
         for (individual, fitness) in population:
             for i in range(0, key_length):
                 if len(new_key) <= i and i < (key_length / 2):
-                    new_key.append((individual.key[i][0], 'ackley_x'))
+                    new_key.append([individual.key[i][0], 'ackley_x'])
                 elif len(new_key) <= i:
-                    new_key.append((individual.key[i][0], 'ackley_sigma'))
+                    new_key.append([individual.key[i][0], 'ackley_sigma'])
                 else:
                     new_key[i][0] += individual.key[i][0]
-        new_key = [(x / population_size, y) for (x, y) in new_key]
+        new_key = [(x / population_size, y) for x, y in new_key]
         new_father = AckleyIndividual(new_key)
         self._empty_population()
-        result = store(new_father)
+        self._empty_extrems()
+        result = self._store(new_father)
         return result
 
-    def _mutation_SA():
-        individual = self.population[0]
+    def _mutation_SA(self):
+        individual = self.population[0][0]
         vector_size = len(individual.key)/2
 
         for i in range(0, self.child_number):
             global_step_size = float(self.global_learning_tax * random.gauss(0, 1))
+            list_sigma = list()
+            list_xi = list()
+
             for j in range(0, vector_size):
-                list_sigma = list()
-                list_xi = list()
                 local_step_size = float(self.local_learning_tax * random.gauss(0, 1))
                 zk = float(random.gauss(0, 1))
                 sigma = float(individual.key[30+j][0])
-                sigma = float(sigma) * float(exp(local_step_size)) * float(exp(global_step_size))
+                sigma = float(sigma) * float(math.exp(local_step_size + global_step_size))
                 list_sigma.append((sigma, 'ackley_sigma'))
                 xi = individual.key[j][0] + float(sigma * zk)
                 list_xi.append((xi, 'ackley_x'))
             new_key = list_xi + list_sigma
             new_individual = AckleyIndividual(new_key)
-            result = store(new_individual)
-        return 1
+            result = self._store(new_individual)
+        return result

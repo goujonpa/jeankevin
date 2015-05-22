@@ -119,11 +119,10 @@ def set_AklI_settings():
     os.system("clear")
 
     if preset == 1:
-        options["iterations"] = int(100)
-        options["stopFitness"] = float(0.98)
-        options["base"] = int(4)
+        options["iterations"] = int(50)
+        options["stopFitness"] = float(0.80)
+        options["base"] = int(8)
         options['verbose'] = int(1)
-        options['maximalPopulation'] = int(8)
 
     elif preset == 2:
         print("\nBASICS")
@@ -142,11 +141,6 @@ def set_AklI_settings():
             "ti (component step size) = 1 / (n)^(1/4)\n"
         ))
 
-        options['maximalPopulation'] = 2 * options['base']
-        options['childNumber'] = 8 * options['base']
-        options['globalLearningTax'] = 1.0 / pow(options['base'], 0.5)
-        options['localLearningTax'] = 1.0 / pow(options['base'], 0.25)
-
         print("\nVERBOSE")
         options["verbose"] = int(raw_input(
             "Verbose Mode\n"
@@ -154,5 +148,9 @@ def set_AklI_settings():
             "-> 0: Disabled\n"
         ))
         os.system("clear")
+    options['maximalPopulation'] = 2 * options['base']
+    options['childNumber'] = 8 * options['base']
+    options['globalLearningTax'] = 1.0 / pow(options['base'], 0.5)
+    options['localLearningTax'] = 1.0 / pow(options['base'], 0.25)
 
     return options
