@@ -2,6 +2,7 @@
 # -*-coding:Utf-8 -*
 
 from modules.individualClass import Individual
+import random
 
 
 class NumberCouple(Individual):
@@ -28,7 +29,7 @@ class NumberCouple(Individual):
             return fitness
 
     def get_binary_standard(self):
-        x1, x2 = self.getKey()
+        x1, x2 = self.key
         x1 = 1000 * x1
         x2 = 1000 * x2
         result = []
@@ -37,7 +38,7 @@ class NumberCouple(Individual):
         return result
 
     def get_real_standard(self):
-        x1, x2 = self.getKey()
+        x1, x2 = self.key
         x1 = 1000 * x1
         x2 = 1000 * x2
         result = []

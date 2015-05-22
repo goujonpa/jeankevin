@@ -5,9 +5,13 @@ import os
 import operator as op
 
 
-def dDisplay(dictionary, verbose):
-    if verbose == 1:
-        print("\n=== {} ===\n\n".format(dictionary['title']))
-        for (key, value) in sorted(dictionary.items(), key=op.itemgetter(0)):
+def display(element, verbose=1, iteration_info=0):
+    if verbose == 1 and type(element) == dict:
+        print("\n=== {} ===\n\n".format(element['title']))
+        for (key, value) in sorted(element.items(), key=op.itemgetter(0)):
             if not key == 'title':
                 print("- {} : {}".format(key, value))
+        raw_input()
+        os.system('clear')
+    else:
+        print("Iteration : {} / {}".format(iteration_info[0], iteration_info[1]))

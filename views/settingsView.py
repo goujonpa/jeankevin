@@ -26,15 +26,15 @@ def set_NCpl_settings():
     os.system("clear")
 
     if preset == 1:
-        options["iterations"] = int(5000)
-        options["stopFitness"] = float(1)
+        options["iterations"] = int(1000)
+        options["stopFitness"] = float(0.98)
         options["crosspoint"] = int(111)
         options["crossmode"] = int(0)
         options["maximalPopulation"] = int(20)
         options["mutationMode"] = int(1)
         options["mutationProbability"] = float(2)
         options["verbose"] = int(0)
-        options["initialPopulation"] = int(1000)
+        options["initialPopulation"] = int(50)
 
     elif preset == 2:
         print("\nBASICS")
@@ -150,7 +150,7 @@ def set_AklI_settings():
         os.system("clear")
     options['maximalPopulation'] = 2 * options['base']
     options['childNumber'] = 8 * options['base']
-    options['globalLearningTax'] = 1.0 / pow(options['base'], 0.5)
-    options['localLearningTax'] = 1.0 / pow(options['base'], 0.25)
+    options['globalLearningRate'] = 1.0 / pow(options['base'], 0.5)
+    options['localLearningRate'] = 1.0 / pow(options['base'], 0.25)
 
     return options
