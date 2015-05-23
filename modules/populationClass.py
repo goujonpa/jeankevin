@@ -149,10 +149,10 @@ class Population(object):
         return self._settings['selectionMode']
 
     def enable_verbose(self):
-        self._settings['verbose'] = int(1)
+        self._settings['verbose'] = True
 
     def disable_verbose(self):
-        self._settings['verbose'] = int(0)
+        self._settings['verbose'] = False
 
     # ----- View
 
@@ -166,8 +166,8 @@ class Population(object):
     def empty_view(self):
         self._view = dict()
 
-    def display(self, element=0, verbose=1):
-        if element == 0:
+    def display(self, element=None, verbose=True):
+        if element is None:
             v.display(self._view, self.verbose, (self.current_iteration, self.stop_iteration))
         else:
             v.display(element, verbose, (self.current_iteration, self.stop_iteration))
@@ -181,7 +181,10 @@ class Population(object):
     # ========== GA & ES Algorithms ==========
 
     def _initialise(self):  # could be more generic
-        self.disable_verbose()
+        verbose = False
+        if self.verbose is True:
+            self.disable_verbose()
+            verbose = True
         if self.individuals_type == 'NumberCouple':
             for i in range(0, self.initial_population):
                 newIndividual = NumberCouple()
@@ -192,7 +195,8 @@ class Population(object):
         elif self.individuals_type == 'AckleyIndividual':
             adam = AckleyIndividual()
             result = self._store(adam)
-        self.enable_verbose()
+        if verbose == True:
+            self.enable_verbose()
         os.system('clear')
 
     def run_ES(self):
@@ -229,7 +233,7 @@ class Population(object):
             self._current_iteration = i
             parent1 = self._selectOne()
             parent2 = self._selectOne()
-            result = self._cross(parent1, parent2)
+            result = self._crossover(parent1, parent2)
             result1 = self._store(self._mutation(result[0]))
             result2 = self._store(self._mutation(result[1]))
             result = (result1, result2)
@@ -265,7 +269,7 @@ class Population(object):
         text = '{} added, fitness = {}'.format(newIndividual.key, newIndividual.fitness)
         self.addview('ADDED', text)
 
-        if self.maximal_population >= 1:
+        if self.maximal_population > 0:
             while (self.population_size > self.maximal_population):  # pops tuple with minimal fitness
                 self._population = sorted(self.population, key=operator.itemgetter(1))
                 poped = self._population.pop(0)
@@ -281,9 +285,9 @@ class Population(object):
             return 1
 
     def _selectOne(self):
-        if self.selection_mode == 1:
+        if self.selection_mode == 'roulette':
             return self._roulette_selection()
-        elif self.selection_mode == 2:
+        elif self.selection_mode == 'turnament':
             return self._tournament_selection()
 
     def _roulette_selection(self):
@@ -330,17 +334,12 @@ class Population(object):
             standard_parent1 = parent1.get_real_standard()
             standard_parent2 = parent2.get_real_standard()
 
-        self.addview('1- Standardized parent #1', standard_string1)
-        self.addview('1- Standardized parent #2', standard_string2)
+        self.addview('1- Standardized parent #1', standard_parent1)
+        self.addview('1- Standardized parent #2', standard_parent2)
 
         crossover_mode = self.crossmode
         if crossover_mode == 'randomOnePoint':
             childs = self._cross_random_one_point(standard_parent1, standard_parent2)
-
-        text = '4- Child #1 - Key[' + str(i) + '] - After crossover'
-        self.addview(str(text), childs[0])
-        text = '4- Child #2 - Key[' + str(i) + '] - After crossover'
-        self.addview(str(text), childs[1])
 
         if mode == 'binary':
             child1 = parent1.get_binary_unstandardized(childs[0])
@@ -360,34 +359,41 @@ class Population(object):
 
         return (child1, child2)
 
-    def _cross_random_one_point(standard_parent1, standard_parent2):
+    def _cross_random_one_point(self, standard_parent1, standard_parent2):
         length1 = len(standard_parent1)
         length2 = len(standard_parent2)  # if difference, exception
-
-        crosspoint = random.randint(min_position, max_position)
-        text = '3- Keys[' + str(i) + '] - CROSSPOINT'
-        self.addview(str(text), crosspoint)
 
         child1 = list()
         child2 = list()
 
         for i in range(0, length1):
+
             string1, size1, min_position1, max_position1 = standard_parent1[i]
-            string2, size2, min_position2, max_position2 = standard_parent2[i]
+            string2, size2, min_position2, max_position2 = standard_parent2[i]  # if not equal raise exception
+
+            crosspoint = random.randint(min_position1, max_position1)
+            text = '3- Keys[' + str(i) + '] - CROSSPOINT'
+            self.addview(str(text), crosspoint)
 
             string1 = string1[0:crosspoint] + string2[crosspoint:]
             string2 = string2[0:crosspoint] + string1[crosspoint:]
+
+            text = '4- Child #1 - Key[' + str(i) + '] - After crossover'
+            self.addview(str(text), string1)
+            text = '4- Child #2 - Key[' + str(i) + '] - After crossover'
+            self.addview(str(text), string2)
+
             child1.append(string1)
             child2.append(string2)
 
-        return (string1, string2)
+        return (child1, child2)
 
-    def _mutation(child):  # Add display !!!
+    def _mutation(self, child):  # Add display !!!
         self.empty_view()
         self.addview('title', 'MUTATION')
         self.addview('0- Individual', child.key)
 
-        crossmode = self.crossmode
+        mode = self.mode
         mutation_mode = self.mutation_mode
         probability = self.mutation_probability
 
@@ -397,28 +403,34 @@ class Population(object):
             standard_child = child.get_real_standard()
         self.addview('1- Standardized', standard_child[0])
 
-        if probability > 1:
-            min_probability = 1.0 / max(size, self.population_size)
-            max_probability = 1.0 / min(size, self.population_size)
-            probability = random.uniform(min_probability, max_probability)
-        self.addview('2- Mutation Probability', probability)
-
         mutated_child = list()
         i = 0
         for (string, size, min_position, max_position) in standard_child:
+
+            if probability > 1:
+                min_probability = 1.0 / max(size, self.population_size)
+                max_probability = 1.0 / min(size, self.population_size)
+                probability = random.uniform(min_probability, max_probability)
+
+            self.addview('2- Mutation Probability', probability)
             text = '3- key[' + str(i) + '] before mutation'
             self.addview(text, string)
+
             if mutation_mode == 'swap':   # swap mode
                 string = self._mutation_GA_swap(string, size, min_position, max_position, probability)
             elif mutation_mode == 'everyNucleotid':    # all nucleotid mode
                 string = self._mutation_GA_every_nucleotid(
-                    string, size, min_position, max_position, probability, crossmode
+                    string, size, min_position, max_position, probability, mode
                 )
             elif mutation_mode == 'oneNucleotid':    # max 1 nucleotid mode
                 string = self._mutation_GA_one_nucleotid(
-                    string, size, min_position, max_position, probability, crossmode
+                    string, size, min_position, max_position, probability, mode
                 )
+
+            text = '4- key[' + str(i) + '] after potential mutation'
+            self.addview(text, string)
             mutated_child.append(string)
+            i = i + 1
 
         if mode == 'binary':
             child = child.get_binary_unstandardized(mutated_child)
@@ -429,6 +441,7 @@ class Population(object):
             child = NumberCouple(child)
 
         self.addview('5- Result', child.key)
+        self.display()
 
         return child
 
@@ -439,7 +452,6 @@ class Population(object):
             a = random.randint(min_position, max_position)
             b = random.randint(min_position, max_position)
         string = string[0:a] + string[b] + string[a+1:b] + string[a] + string[b+1:]
-        self.addview('4- After swap', string)
         return string
 
     def _mutation_GA_every_nucleotid(self, string, size, min_position, max_position, mutation_probability, crossmode):
@@ -454,7 +466,6 @@ class Population(object):
                 elif crossmode == 'real':
                     char = str(random.randint(0, 9))
                 string = string[0:i] + char + string[i+1:]
-        self.addview('4- After potential mutation (every nucleotid mode)', string)
         return string
 
     def _mutation_GA_one_nucleotid(self, string, size, min_position, max_position, mutation_probability, crossmode):
@@ -469,7 +480,6 @@ class Population(object):
             elif crossmode == 'real':
                 char = str(random.randint(0, 9))
             string = string[0:i] + char + string[i+1:]
-            self.addview('4- After potential mutation (one nucleotid mode)', string)
             return string
 
     def _recombination_ES_Nx_Nsigma_inter(self):

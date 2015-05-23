@@ -26,6 +26,8 @@ class NumberCouple(Individual):
 
     def _calcul_fitness(self):
             x1, x2 = self._key
+            x1 = x1[0]
+            x2 = x2[0]
             functionResult = 100 * pow((x2 - pow(x1, 2)), 2) + pow((x1 - 1), 2)
             fitness = 1.0 / (1 + functionResult)
             return fitness

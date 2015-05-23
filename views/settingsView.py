@@ -10,7 +10,7 @@ def set_NCpl_settings():
     os.system("clear")
 
     print(
-        "\n---> NumberCouple Individual\n"
+        "---> NumberCouple Individual\n"
         "\n===== OPTIONS =====\n"
     )
 
@@ -26,62 +26,84 @@ def set_NCpl_settings():
     os.system("clear")
 
     if preset == 1:
-        options["iterations"] = int(1000)
-        options["stopFitness"] = float(0.98)
-        options["crosspoint"] = int(111)
-        options["crossmode"] = int(0)
-        options["maximalPopulation"] = int(20)
-        options["mutationMode"] = int(1)
+        options["iterations"] = int(1000000)
+        options["stopFitness"] = float(1)
+        options["mode"] = 'binary'
+        options['crossMode'] = 'randomOnePoint'
+        options["maximalPopulation"] = int(50)
+        options["mutationMode"] = 'everyNucleotid'
         options["mutationProbability"] = float(2)
-        options["verbose"] = int(1)
-        options["initialPopulation"] = int(50)
-        options['selectionMode'] = int(1)
+        options["verbose"] = False
+        options["initialPopulation"] = int(100)
+        options['selectionMode'] = 'roulette'
 
     elif preset == 2:
-        print("\nBASICS")
-        x = int(raw_input("Stop Iterations Number:\n"))
-        options["iterations"] = int(x) - 1
+        print('BASICS')
+        x = int(raw_input('Stop Iterations Number:\n'))
+        options['iterations'] = int(x)
 
-        options['stopFitness'] = float(raw_input("\nStop Fitness:\n"))
-        os.system("clear")
+        options['stopFitness'] = float(raw_input('\nStop Fitness:\n'))
+        os.system('clear')
 
-        print("\nCROSSOVER")
+        print('SELECTION')
 
-        options["crossmode"] = int(raw_input(
-            "Crossover Mode:\n"
-            "-> 0: Binary mode\n"
-            "-> 1: Real mode\n"
+        options['selectionMode'] = int(raw_input(
+            '\nSelection Method:\n'
+            '--> 1: Roulette method\n'
+        ))
+        if options['selectionMode'] == 1:
+            options['selectionMode'] = 'roulette'
+
+        os.system('clear')
+
+        print('CROSSOVER & MUTATIONS')
+
+        options['mode'] = int(raw_input(
+            'Mode:\n'
+            '-> 1: Binary mode\n'
+            '-> 2: Real mode\n'
+        ))
+        if options['mode'] == 1:
+            options['mode'] = 'binary'
+        elif options['mode'] == 2:
+            options['mode'] = 'real'
+
+        options['crossMode'] = int(raw_input(
+            'Crossover Mode:\n'
+            '--> 1: One random one point\n'
+        ))
+        if options['crossMode'] == 1:
+            options['crossMode'] = 'randomOnePoint'
+
+        options['mutationMode'] = int(raw_input(
+            'Mutation Mode:\n'
+            '-> 0: Swap mode (only for real mode)\n'
+            '-> 1: Each nucleotid has a chance to be muted, one by one\n'
+            '-> 2: 1 mutation maximum by child\n'
+        ))
+        if options['mutationMode'] == 0:
+            options['mutationMode'] = 'swap'
+        elif options['mutationMode'] == 1:
+            options['mutationMode'] = 'everyNucleotid'
+        elif options['mutationMode'] == 2:
+            options['mutationMode'] = 'oneNucleotid'
+
+        options['mutationProbability'] = float(raw_input(
+            'Mutation Probability Mode:\n'
+            '-> 0 < n < 1: Fixed Probability\n'
+            '-> 2: Random Probability, basically between 1/BitArraySize and 1/PopulationSize\n'
         ))
 
-        options["crosspoint"] = int(raw_input(
-            "Crosspoint Mode:\n"
-            "-> 0 <= n <= 11: Fixed to position n\n"
-            "-> Other: Random movement\n"
-        ))
-        os.system("clear")
+        os.system('clear')
 
         print("\nPOPULATION")
         options["maximalPopulation"] = int(raw_input(
             "Maximal Population:\n"
-            "-> n > 2: elitist insertion, just keep n best individuals\n"
+            "-> n > 0: elitist insertion, just keep n best individuals\n"
             "-> Other: every individual is kept (can slow down the algorythm for several iterations)\n"
         ))
-        os.system("clear")
 
-        print("\nMUTATIONS")
-
-        options["mutationMode"] = int(raw_input(
-            "Mutation Mode:\n"
-            "-> 0: Swap mode (only for real mode)\n"
-            "-> 1: Each nucleotid has a chance to be muted, one by one\n"
-            "-> 2: 1 mutation maximum by child\n"
-        ))
-
-        options["mutationProbability"] = float(raw_input(
-            "Mutation Probability Mode:\n"
-            "-> 0 < n < 1: Fixed Probability\n"
-            "-> 2: Random Probability, basically between 1/BitArraySize and 1/PopulationSize\n"
-        ))
+        options["initialPopulation"] = int(raw_input("\nInitialise with how much individuals ?\n"))
         os.system("clear")
 
         print("\nVERBOSE")
@@ -90,11 +112,13 @@ def set_NCpl_settings():
             "-> 1: Enabled\n"
             "-> 0: Disabled\n"
         ))
+        if options['verbose'] == 0:
+            options['verbose'] = False
+        elif options['verbose'] == 1:
+            options['verbose'] = True
+
         os.system("clear")
 
-        print("\n===== POPULATION INITIALISATION =====\n")
-        options["initialPopulation"] = int(raw_input("\nInitialise with how much individuals ?\n"))
-        os.system("clear")
 
     return options
 
@@ -123,7 +147,7 @@ def set_AklI_settings():
         options["iterations"] = int(50)
         options["stopFitness"] = float(0.80)
         options["base"] = int(8)
-        options['verbose'] = int(1)
+        options['verbose'] = True
         options['selectionMode'] = int(1)
 
     elif preset == 2:
