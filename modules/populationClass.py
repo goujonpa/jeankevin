@@ -137,12 +137,12 @@ class Population(object):
         return self._settings['mutationProbability']
 
     @property
-    def crossmode(self):
-        return self._settings['crossmode']
+    def mode(self):
+        return self._settings['mode']
 
     @property
-    def crosstype(self):
-        return self._settings['crossType']
+    def crossmode(self):
+        return self._settings['crossMode']
 
     @property
     def selection_mode(self):
@@ -229,21 +229,10 @@ class Population(object):
             self._current_iteration = i
             parent1 = self._selectOne()
             parent2 = self._selectOne()
-
             result = self._cross(parent1, parent2)
-
-            result1 = self._store(result[0])
-            result2 = self._store(result[1])
+            result1 = self._store(self._mutation(result[0]))
+            result2 = self._store(self._mutation(result[1]))
             result = (result1, result2)
-# ============= cacacacacacaca
-        childString1 = self._mutation(childString1, size1, minCrossPosition1, maxCrossPosition1)
-        childString2 = self._mutation(childString2, size2, minCrossPosition2, maxCrossPosition2)
-
-        text = '5- Child #1 - Key[' + str(i) + '] - After mutation'
-        self.addview(str(text), childString1)
-        text = '5- Child #2 - Key[' + str(i) + '] - After mutation'
-        self.addview(str(text), childString2)
-#   ------------
 
             i = i + 1
             self._save_iterations.append(i)
@@ -328,39 +317,46 @@ class Population(object):
 
     def _crossover(self, parent1, parent2):
         self.empty_view()
-        self.addview('title', 'CROSSOVER & MUTATIONS RESUME')
+        self.addview('title', 'CROSSOVER')
 
         self.addview('0- Parent #1', parent1.key)
         self.addview('0- Parent #2', parent2.key)
 
-        crossmode = self.crossmode
-        if crossmode == 'binary':
+        mode = self.mode
+        if mode == 'binary':
             standard_parent1 = parent1.get_binary_standard()
             standard_parent2 = parent2.get_binary_standard()
-        elif crossmode == 'real':
+        elif mode == 'real':
             standard_parent1 = parent1.get_real_standard()
             standard_parent2 = parent2.get_real_standard()
 
         self.addview('1- Standardized parent #1', standard_string1)
         self.addview('1- Standardized parent #2', standard_string2)
 
-        crossover_type = self.crosstype
-        if crossover_type == 'randomOnePoint':
+        crossover_mode = self.crossmode
+        if crossover_mode == 'randomOnePoint':
             childs = self._cross_random_one_point(standard_parent1, standard_parent2)
 
-        if crossmode == 'binary':
+        text = '4- Child #1 - Key[' + str(i) + '] - After crossover'
+        self.addview(str(text), childs[0])
+        text = '4- Child #2 - Key[' + str(i) + '] - After crossover'
+        self.addview(str(text), childs[1])
+
+        if mode == 'binary':
             child1 = parent1.get_binary_unstandardized(childs[0])
             child2 = parent1.get_binary_unstandardized(childs[1])
-        elif crossmode == 'real':
+        elif mode == 'real':
             child1 = parent1.get_binary_unstandardized(childs[0])
             child2 = parent1.get_binary_unstandardized(childs[1])
 
-        self.addview('6- Unstandardized Child #1', child1)
-        self.addview('6- Unstandardized Child #2', child2)
+        self.addview('5- Unstandardized Child #1', child1)
+        self.addview('5- Unstandardized Child #2', child2)
 
         if self.individuals_type == 'NumberCouple':
             child1 = NumberCouple(child1)
             child2 = NumberCouple(child2)
+
+        self.display()
 
         return (child1, child2)
 
@@ -384,32 +380,57 @@ class Population(object):
             child1.append(string1)
             child2.append(string2)
 
-            text = '4- Child #1 - Key[' + str(i) + '] - After crossover'
-            self.addview(str(text), string1)
-            text = '4- Child #2 - Key[' + str(i) + '] - After crossover'
-            self.addview(str(text), string2)
-
         return (string1, string2)
 
+    def _mutation(child):  # Add display !!!
+        self.empty_view()
+        self.addview('title', 'MUTATION')
+        self.addview('0- Individual', child.key)
 
-    def _mutation(self, string, size, min_position, max_position):  # Add display !!!
         crossmode = self.crossmode
         mutation_mode = self.mutation_mode
         probability = self.mutation_probability
+
+        if mode == 'binary':
+            standard_child = child.get_binary_standard()
+        elif mode == 'real':
+            standard_child = child.get_real_standard()
+        self.addview('1- Standardized', standard_child[0])
 
         if probability > 1:
             min_probability = 1.0 / max(size, self.population_size)
             max_probability = 1.0 / min(size, self.population_size)
             probability = random.uniform(min_probability, max_probability)
+        self.addview('2- Mutation Probability', probability)
 
-        if mutation_mode == 'swap':   # swap mode
-            string = self._mutation_GA_swap(string, size, min_position, max_position, probability)
-        elif mutation_mode == 'everyNucleotid':    # all nucleotid mode
-            string = self._mutation_GA_every_nucleotid(string, size, min_position, max_position, probability, crossmode)
-        elif mutation_mode == 'oneNucleotid':    # max 1 nucleotid mode
-            string = self._mutation_GA_one_nucleotid(string, size, min_position, max_position, probability, crossmode)
+        mutated_child = list()
+        i = 0
+        for (string, size, min_position, max_position) in standard_child:
+            text = '3- key[' + str(i) + '] before mutation'
+            self.addview(text, string)
+            if mutation_mode == 'swap':   # swap mode
+                string = self._mutation_GA_swap(string, size, min_position, max_position, probability)
+            elif mutation_mode == 'everyNucleotid':    # all nucleotid mode
+                string = self._mutation_GA_every_nucleotid(
+                    string, size, min_position, max_position, probability, crossmode
+                )
+            elif mutation_mode == 'oneNucleotid':    # max 1 nucleotid mode
+                string = self._mutation_GA_one_nucleotid(
+                    string, size, min_position, max_position, probability, crossmode
+                )
+            mutated_child.append(string)
 
-        return string
+        if mode == 'binary':
+            child = child.get_binary_unstandardized(mutated_child)
+        elif mode == 'real':
+            child = child.get_real_unstandardized(mutated_child)
+
+        if self.individuals_type == 'NumberCouple':
+            child = NumberCouple(child)
+
+        self.addview('5- Result', child.key)
+
+        return child
 
     def _mutation_GA_swap(self, string, size, min_position, max_position, mutation_probability):
         a = 0
@@ -418,6 +439,7 @@ class Population(object):
             a = random.randint(min_position, max_position)
             b = random.randint(min_position, max_position)
         string = string[0:a] + string[b] + string[a+1:b] + string[a] + string[b+1:]
+        self.addview('4- After swap', string)
         return string
 
     def _mutation_GA_every_nucleotid(self, string, size, min_position, max_position, mutation_probability, crossmode):
@@ -432,9 +454,10 @@ class Population(object):
                 elif crossmode == 'real':
                     char = str(random.randint(0, 9))
                 string = string[0:i] + char + string[i+1:]
+        self.addview('4- After potential mutation (every nucleotid mode)', string)
         return string
 
-    def _mutation_GA_one_nucleotid(self, string, s_type, size, min_position, max_position, mutation_probability, crossmode):
+    def _mutation_GA_one_nucleotid(self, string, size, min_position, max_position, mutation_probability, crossmode):
         pick = random.uniform(0, 1)
         if pick < mutation_probability:
             i = random.randint(min_position, max_position)
@@ -446,6 +469,7 @@ class Population(object):
             elif crossmode == 'real':
                 char = str(random.randint(0, 9))
             string = string[0:i] + char + string[i+1:]
+            self.addview('4- After potential mutation (one nucleotid mode)', string)
             return string
 
     def _recombination_ES_Nx_Nsigma_inter(self):
