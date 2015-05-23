@@ -141,6 +141,10 @@ class Population(object):
         return self._settings['crossmode']
 
     @property
+    def crosstype(self):
+        return self._settings['crossType']
+
+    @property
     def selection_mode(self):
         return self._settings['selectionMode']
 
@@ -231,6 +235,15 @@ class Population(object):
             result1 = self._store(result[0])
             result2 = self._store(result[1])
             result = (result1, result2)
+# ============= cacacacacacaca
+        childString1 = self._mutation(childString1, size1, minCrossPosition1, maxCrossPosition1)
+        childString2 = self._mutation(childString2, size2, minCrossPosition2, maxCrossPosition2)
+
+        text = '5- Child #1 - Key[' + str(i) + '] - After mutation'
+        self.addview(str(text), childString1)
+        text = '5- Child #2 - Key[' + str(i) + '] - After mutation'
+        self.addview(str(text), childString2)
+#   ------------
 
             i = i + 1
             self._save_iterations.append(i)
@@ -313,7 +326,7 @@ class Population(object):
         self.display()
         return individual
 
-    def _cross(self, parent1, parent2):
+    def _crossover(self, parent1, parent2):
         self.empty_view()
         self.addview('title', 'CROSSOVER & MUTATIONS RESUME')
 
@@ -321,112 +334,119 @@ class Population(object):
         self.addview('0- Parent #2', parent2.key)
 
         crossmode = self.crossmode
-        if crossmode == 0:
-            standardParent1 = parent1.get_binary_standard()
-            standardParent2 = parent2.get_binary_standard()
-        elif crossmode == 1:
-            standardParent1 = parent1.get_real_standard()
-            standardParent2 = parent2.get_real_standard()
+        if crossmode == 'binary':
+            standard_parent1 = parent1.get_binary_standard()
+            standard_parent2 = parent2.get_binary_standard()
+        elif crossmode == 'real':
+            standard_parent1 = parent1.get_real_standard()
+            standard_parent2 = parent2.get_real_standard()
 
-        self.addview('1- Standardized parent #1', standardParent1)
-        self.addview('1- Standardized parent #2', standardParent2)
+        self.addview('1- Standardized parent #1', standard_string1)
+        self.addview('1- Standardized parent #2', standard_string2)
 
-        length1 = len(parent1.key)
-        length2 = len(parent2.key)    # if not == raise exception
+        crossover_type = self.crosstype
+        if crossover_type == 'randomOnePoint':
+            childs = self._cross_random_one_point(standard_parent1, standard_parent2)
 
-        self.addview('2- Length #1', length1)
-        self.addview('2- Length #2', length2)
+        if crossmode == 'binary':
+            child1 = parent1.get_binary_unstandardized(childs[0])
+            child2 = parent1.get_binary_unstandardized(childs[1])
+        elif crossmode == 'real':
+            child1 = parent1.get_binary_unstandardized(childs[0])
+            child2 = parent1.get_binary_unstandardized(childs[1])
+
+        self.addview('6- Unstandardized Child #1', child1)
+        self.addview('6- Unstandardized Child #2', child2)
+
+        if self.individuals_type == 'NumberCouple':
+            child1 = NumberCouple(child1)
+            child2 = NumberCouple(child2)
+
+        return (child1, child2)
+
+    def _cross_random_one_point(standard_parent1, standard_parent2):
+        length1 = len(standard_parent1)
+        length2 = len(standard_parent2)  # if difference, exception
+
+        crosspoint = random.randint(min_position, max_position)
+        text = '3- Keys[' + str(i) + '] - CROSSPOINT'
+        self.addview(str(text), crosspoint)
 
         child1 = list()
         child2 = list()
 
         for i in range(0, length1):
-            string1, size1, minCrossPosition1, maxCrossPosition1 = standardParent1[i]
-            string2, size2, minCrossPosition2, maxCrossPosition2 = standardParent2[i]  # if not equals, exception
+            string1, size1, min_position1, max_position1 = standard_parent1[i]
+            string2, size2, min_position2, max_position2 = standard_parent2[i]
 
-            crosspoint = random.randint(minCrossPosition1, maxCrossPosition1)
-            text = '3- Keys[' + str(i) + '] - CROSSPOINT'
-            self.addview(str(text), crosspoint)
-
-            childString1 = string1[0:crosspoint] + string2[crosspoint:]
-            childString2 = string2[0:crosspoint] + string1[crosspoint:]
+            string1 = string1[0:crosspoint] + string2[crosspoint:]
+            string2 = string2[0:crosspoint] + string1[crosspoint:]
+            child1.append(string1)
+            child2.append(string2)
 
             text = '4- Child #1 - Key[' + str(i) + '] - After crossover'
-            self.addview(str(text), childString1)
+            self.addview(str(text), string1)
             text = '4- Child #2 - Key[' + str(i) + '] - After crossover'
-            self.addview(str(text), childString2)
+            self.addview(str(text), string2)
 
-            childString1 = self._mutate(childString1, size1, minCrossPosition1, maxCrossPosition1)
-            childString2 = self._mutate(childString2, size2, minCrossPosition2, maxCrossPosition2)
+        return (string1, string2)
 
-            text = '5- Child #1 - Key[' + str(i) + '] - After mutation'
-            self.addview(str(text), childString1)
-            text = '5- Child #2 - Key[' + str(i) + '] - After mutation'
-            self.addview(str(text), childString2)
 
-            child1.append(childString1)
-            child2.append(childString2)
-
-        if self.individuals_type == 'NumberCouple' and crossmode == 0:
-            child1 = NumberCouple.get_binary_unstandardized(child1)
-            newChild1 = NumberCouple(child1)
-            child2 = NumberCouple.get_binary_unstandardized(child2)
-            newChild2 = NumberCouple(child2)
-        elif self.individuals_type == 'NumberCouple' and crossmode == 1:
-            newChild1 = NumberCouple(NumberCouple.get_real_unstandardized(child1))
-            newChild2 = NumberCouple(NumberCouple.get_real_unstandardized(child2))
-
-        self.addview('6- Unstandardized Child #1', child1)
-        self.addview('6- Unstandardized Child #2', child2)
-
-        self.display()
-
-        return (newChild1, newChild2)
-
-    def _mutate(self, childString, size, minCrossPosition, maxCrossPosition):  # Add display !!!
-        mutationMode = self.mutation_mode
-        mutationProbability = self.mutation_probability
-        stringType = self.individuals_type
+    def _mutation(self, string, size, min_position, max_position):  # Add display !!!
         crossmode = self.crossmode
+        mutation_mode = self.mutation_mode
+        probability = self.mutation_probability
 
-        if mutationProbability > 1:
-            minMutationProbability = 1.0 / max(size, self.population_size)
-            maxMutationProbability = 1.0 / min(size, self.population_size)
-            mutationProbability = random.uniform(minMutationProbability, maxMutationProbability)
+        if probability > 1:
+            min_probability = 1.0 / max(size, self.population_size)
+            max_probability = 1.0 / min(size, self.population_size)
+            probability = random.uniform(min_probability, max_probability)
 
-        if mutationMode == 0:   # swap mode
-            a = 0
-            b = 0
-            while a == b and b < a:
-                a = random.randint(minCrossPosition, maxCrossPosition)
-                b = random.randint(minCrossPosition, maxCrossPosition)
-            childString = childString[0:a] + childString[b] + childString[a+1:b] + childString[a] + ChildString[b+1:]
-        elif mutationMode == 1:    # all nucleotid mode
-            for i in range(minCrossPosition, maxCrossPosition):
-                pick = random.uniform(0, 1)
-                if pick < mutationProbability:
-                    if crossmode == 0:
-                        if childString[i] == '1':
-                            char = '0'
-                        elif childString[i] == '0':
-                            char = '1'
-                    elif crossmode == 1:
-                        char = str(random.randint(0, 9))
-                    childString = childString[0:i] + char + childString[i+1:]
-        elif mutationMode == 2:    # max 1 nucleotid mode
+        if mutation_mode == 'swap':   # swap mode
+            string = self._mutation_GA_swap(string, size, min_position, max_position, probability)
+        elif mutation_mode == 'everyNucleotid':    # all nucleotid mode
+            string = self._mutation_GA_every_nucleotid(string, size, min_position, max_position, probability, crossmode)
+        elif mutation_mode == 'oneNucleotid':    # max 1 nucleotid mode
+            string = self._mutation_GA_one_nucleotid(string, size, min_position, max_position, probability, crossmode)
+
+        return string
+
+    def _mutation_GA_swap(self, string, size, min_position, max_position, mutation_probability):
+        a = 0
+        b = 0
+        while a == b and b < a:
+            a = random.randint(min_position, max_position)
+            b = random.randint(min_position, max_position)
+        string = string[0:a] + string[b] + string[a+1:b] + string[a] + string[b+1:]
+        return string
+
+    def _mutation_GA_every_nucleotid(self, string, size, min_position, max_position, mutation_probability, crossmode):
+        for i in range(min_position, max_position):
             pick = random.uniform(0, 1)
-            if pick < mutationProbability:
-                i = random.randint(minCrossPosition, maxCrossPosition)
-                if crossmode == 0:
-                    if childString[i] == '1':
+            if pick < mutation_probability:
+                if crossmode == 'binary':
+                    if string[i] == '1':
                         char = '0'
-                    elif childString[i] == '0':
+                    elif string[i] == '0':
                         char = '1'
-                elif crossmode == 1:
+                elif crossmode == 'real':
                     char = str(random.randint(0, 9))
-                childString = childString[0:i] + char + childString[i+1:]
+                string = string[0:i] + char + string[i+1:]
+        return string
 
-        return childString
+    def _mutation_GA_one_nucleotid(self, string, s_type, size, min_position, max_position, mutation_probability, crossmode):
+        pick = random.uniform(0, 1)
+        if pick < mutation_probability:
+            i = random.randint(min_position, max_position)
+            if crossmode == 'binary':
+                if string[i] == '1':
+                    char = '0'
+                elif string[i] == '0':
+                    char = '1'
+            elif crossmode == 'real':
+                char = str(random.randint(0, 9))
+            string = string[0:i] + char + string[i+1:]
+            return string
 
     def _recombination_ES_Nx_Nsigma_inter(self):
         population = self.population

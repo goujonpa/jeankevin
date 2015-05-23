@@ -18,9 +18,11 @@ class NumberCouple(Individual):
         super(NumberCouple, self).__init__(key)
 
     def _random_initialisation(self):
-        x1 = random.uniform(-2.048, 2.048)
-        x2 = random.uniform(-2.048, 2.048)
-        return (x1, x2)
+        key = list()
+        for i in range(0, 2):
+            x = random.uniform(-2.048, 2.048)
+            key.append((x, 'real'))
+        return key
 
     def _calcul_fitness(self):
             x1, x2 = self._key
@@ -30,8 +32,8 @@ class NumberCouple(Individual):
 
     def get_binary_standard(self):
         x1, x2 = self.key
-        x1 = 1000 * x1
-        x2 = 1000 * x2
+        x1 = 1000 * x1[0]
+        x2 = 1000 * x2[0]
         result = []
         result.append((self._binarize(x1, 12), 15, 3, 14))
         result.append((self._binarize(x2, 12), 15, 3, 14))
@@ -39,8 +41,8 @@ class NumberCouple(Individual):
 
     def get_real_standard(self):
         x1, x2 = self.key
-        x1 = 1000 * x1
-        x2 = 1000 * x2
+        x1 = 1000 * x1[0]
+        x2 = 1000 * x2[0]
         result = []
         result.append((self._realize(x1, 12), 13, 9, 12))
         result.append((self._realize(x2, 12), 13, 9, 12))
@@ -52,7 +54,7 @@ class NumberCouple(Individual):
         for element in l:
             a = int(element, 2)
             a = a / 1000.0
-            key.append(a)
+            key.append((a, 'real'))
         return key
 
     @staticmethod
@@ -61,5 +63,5 @@ class NumberCouple(Individual):
         for element in l:
             a = int(element)
             a = a / 1000.0
-            key.append(a)
+            key.append((a, 'real'))
         return key
