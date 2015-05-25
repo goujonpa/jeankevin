@@ -57,6 +57,10 @@ class Population(object):
     def population_size(self):
         return len(self._population)
 
+    @property
+    def parent(self):
+        return self.population[0][0]
+
     # ----- Fitness
 
     @property
@@ -149,6 +153,10 @@ class Population(object):
     def selection_mode(self):
         return self._settings['selectionMode']
 
+    @property
+    def recombination_mode(self):
+        return self._settings['recombinationMode']
+
     def enable_verbose(self):
         self._settings['verbose'] = True
 
@@ -196,33 +204,9 @@ class Population(object):
         elif self.individuals_type == 'AckleyIndividual':
             adam = AckleyIndividual()
             result = self._store(adam)
-        if verbose == True:
+        if verbose is True:
             self.enable_verbose()
         os.system('clear')
-
-    def run_ES(self):
-        # Initialisation done by initialise()
-        i = 0
-        while i < self.stop_iteration and self.population[0][1] < self.stop_fitness:
-            self._current_iteration = i
-            self._save_iterations.append(i)
-            self._save_fitness_sums.append(self.fitness_sums)
-            self._save_maximums.append(self.best.fitness)
-            self._mutation_ES_Nx_Nsigma_gauss_2LR()  # Self-adapted
-            j = i + 0.5
-
-            self._save_iterations.append(j)
-            self._save_fitness_sums.append(self.fitness_sums)
-            self._save_maximums.append(self.best.fitness)
-            self._recombination_ES_select_best_YOLO()
-            self.display()
-            i += 1
-
-        best = self.best
-        print("\n\nBest:\n{} : fitness = {}".format(best.key, best.fitness))
-        vSave.save_figure(self._save_iterations, self._save_fitness_sums, self._save_maximums, 'simuES')
-
-        return 1
 
     def run_GA(self):
         result = (1, 1)
@@ -236,8 +220,8 @@ class Population(object):
             parent1 = self._selectOne()
             parent2 = self._selectOne()
             result = self._crossover(parent1, parent2)
-            result1 = self._store(self._mutation(result[0]))
-            result2 = self._store(self._mutation(result[1]))
+            result1 = self._store(self._mutation_GA(result[0]))
+            result2 = self._store(self._mutation_GA(result[1]))
             result = (result1, result2)
 
             i = i + 1
@@ -248,8 +232,6 @@ class Population(object):
         best = self.best
         print("\n\nBest:\n{} : fitness = {}".format(best.key, best.fitness))
         vSave.save_figure(self._save_iterations, self._save_fitness_sums, self._save_maximums, 'simuGA')
-
-        return 1
 
     def _store(self, newIndividual):
         self.empty_view()
@@ -390,7 +372,7 @@ class Population(object):
 
         return (child1, child2)
 
-    def _mutation(self, child):  # Add display !!!
+    def _mutation_GA(self, child):  # Add display !!!
         self.empty_view()
         self.addview('title', 'MUTATION')
         self.addview('0- Individual', child.key)
@@ -484,56 +466,95 @@ class Population(object):
             string = string[0:i] + char + string[i+1:]
             return string
 
-    def _recombination_ES_Nx_Nsigma_inter(self):
-        population = self.population
-        population_size = self.population_size
-        key_length = len(population[0][0].key)
+    def run_ES(self):
+        # Initialisation done by initialise()
+        i = 0
+        while i < self.stop_iteration and self.max_fitness < self.stop_fitness:
+            self._current_iteration = i
+            self._save_iterations.append(i)
+            self._save_fitness_sums.append(self.fitness_sums)
+            self._save_maximums.append(self.best.fitness)
+            self._mutation_ES()  # Self-adapted
+            j = i + 0.5
 
-        new_key = list()
-        for (individual, fitness) in population:
-            for i in range(0, key_length):
-                if len(new_key) <= i and i < (key_length / 2):
-                    new_key.append([individual.key[i][0], 'ackley_x'])
-                elif len(new_key) <= i:
-                    new_key.append([individual.key[i][0], 'ackley_sigma'])
-                else:
-                    new_key[i][0] += individual.key[i][0]
+            self._save_iterations.append(j)
+            self._save_fitness_sums.append(self.fitness_sums)
+            self._save_maximums.append(self.best.fitness)
+            self._recombination_ES()
+            i += 1
 
-        new_key = [(float(x / population_size), y) for x, y in new_key]
-        new_father = AckleyIndividual(new_key)
-
-        self._empty_population()
-        result = self._store(new_father)
-        return result
-
-    def _recombination_ES_Nx_Nsigma_weighted(self):  # TO IMPLEMENT MG
-        population = self.population
-        population_size = self.population_size
-        key_length = len(population[0][0].key)
-        new_key = list()
-        for (individual, fitness) in population:
-            for i in range(0, key_length):
-                if len(new_key) <= i and i < (key_length / 2):
-                    new_key.append([individual.key[i][0], 'ackley_x'])
-                elif len(new_key) <= i:
-                    new_key.append([individual.key[i][0], 'ackley_sigma'])
-                else:
-                    new_key[i][0] += individual.key[i][0]
-        new_key = [(float(x / population_size), y) for x, y in new_key]
-        new_father = AckleyIndividual(new_key)
-        self._empty_population()
-        result = self._store(new_father)
-        return result
-
-    def _recombination_ES_select_best_YOLO(self):
         best = self.best
+        print("\n\nBest:\n{} : fitness = {}".format(best.key, best.fitness))
+        vSave.save_figure(self._save_iterations, self._save_fitness_sums, self._save_maximums, 'simuES')
+
+    def _recombination_ES(self):
+        if self.recombination_mode == 'intermediate':
+            self._recombination_ES_intermediate()
+        elif self.recombination_mode == 'best':
+            self._recombination_ES_best()
+        elif self.recombination_mode == 'weighted':
+            self_recombination_ES_weighted()
+
+    def _recombination_ES_intermediate(self):
+        population = self.population
+        population_size = self.population_size
+        key_length = len(population[0][0].key)
+
+        new_key = list()
+        for (individual, fitness) in population:
+            for i in range(0, key_length):
+                if len(new_key) <= i and i < (key_length / 2):
+                    new_key.append([individual.key[i][0], 'ackley_x'])
+                elif len(new_key) <= i:
+                    new_key.append([individual.key[i][0], 'ackley_sigma'])
+                else:
+                    new_key[i][0] += individual.key[i][0]
+
+        new_key = [(float(x / population_size), y) for x, y in new_key]
+        new_father = AckleyIndividual(new_key)
+
         self._empty_population()
-        result = self._store(best)
+        result = self._store(new_father)
         return result
 
-    def _mutation_ES_Nx_Nsigma_gauss_2LR(self):
-        individual = self.population[0][0]
-        vector_size = len(individual.key)/2
+    def _recombination_ES_weighted(self):  # TO IMPLEMENT MG
+        population = self.population
+        population_size = self.population_size
+        key_length = len(population[0][0].key)
+        new_key = list()
+        for (individual, fitness) in population:
+            for i in range(0, key_length):
+                if len(new_key) <= i and i < (key_length / 2):
+                    new_key.append([individual.key[i][0], 'ackley_x'])
+                elif len(new_key) <= i:
+                    new_key.append([individual.key[i][0], 'ackley_sigma'])
+                else:
+                    new_key[i][0] += individual.key[i][0]
+        new_key = [(float(x / population_size), y) for x, y in new_key]
+        new_father = AckleyIndividual(new_key)
+        self._empty_population()
+        result = self._store(new_father)
+        return result
+
+    def _recombination_ES_best(self):
+        self.empty_view()
+        self.addview('title', 'RECOMBINATION BEST')
+        best = self.best
+        self.addview('Best', best.key)
+        self.addview('Fitness', best.fitness)
+        self._empty_population()
+        self._store(best)
+        self.display()
+
+    def _mutation_ES(self):
+        if self.mutation_mode == '1LR1S':
+            self._mutation_ES_1LR1S()
+        elif self.mutation_mode == '2LRNS':
+            self._mutation_ES_2LRNS()
+
+    def _mutation_ES_2LRNS(self):  # pretty weird results....????!
+        individual = self.parent
+        vector_size = individual.vector_size
 
         for i in range(0, self.child_number):
             global_step_size = float(self.global_learning_rate * random.gauss(0, 1))
@@ -553,25 +574,34 @@ class Population(object):
             result = self._store(new_individual)
         return result
 
-    def _mutation_ES_Nx_1sigma_gauss_1LR(self):  # to implement !!!
-        individual = self.population[0][0]
-        vector_size = len(individual.key)/2
-
-        # need to have juste 1 sigma in my child -> would be better at the beginning of run_ES
+    def _mutation_ES_1LR1S(self):  # to implement !!!
+        self.empty_view()
+        self.addview('title', 'MUTATION 1LR1S')
+        individual = self.parent
+        vector_size = individual.vector_size
+        individual.uniformise_sigma()
+        self.addview('0- xi Before mutation', [x for (x, y) in individual.xi])
+        self.addview('0- sigmas Before mutation', [x for (x, y) in individual.sigmas])
+        self.addview('0- Global learning rate:', self.global_learning_rate)
 
         for i in range(0, self.child_number):
             global_step_size = float(self.global_learning_rate * random.gauss(0, 1))
+            self.addview('1- Global step size', global_step_size)
             list_sigma = list()
             list_xi = list()
-
             for j in range(0, vector_size):
-                zk = float(random.gauss(0, 1))
                 sigma = float(individual.key[30+j][0])
-                sigma = float(sigma) * float(math.exp(global_step_size))
+                sigma = sigma * float(math.exp(global_step_size))
                 list_sigma.append((sigma, 'ackley_sigma'))
-                xi = individual.key[j][0] + float(sigma * zk)
+                xi = float(individual.key[j][0]) + sigma
                 list_xi.append((xi, 'ackley_x'))
             new_key = list_xi + list_sigma
+
+            self.addview('2- New child x', [x for (x, y) in list_xi])
+            self.addview('3- New child sigma', [x for (x, y) in list_sigma[0:1]])
             new_individual = AckleyIndividual(new_key)
-            result = self._store(new_individual)
-        return result
+            self.addview('4- New fitness', new_individual.fitness)
+            self.display()
+            self._store(new_individual)
+            self.empty_view()
+            self.addview('title', 'MUTATION 1LR1S')

@@ -36,6 +36,10 @@ class Individual(object):
         self._fitness = self._calcul_fitness()
 
     @property
+    def vector_size(self):
+        return (len(self.key)/2)
+
+    @property
     def fitness(self):
         return self._fitness
 
@@ -63,6 +67,16 @@ class Individual(object):
     def _calcul_fitness(self):
         pass
 
+    @property
+    def xi(self):
+        size = self.vector_size
+        return self.key[0:size]
+
+    @property
+    def sigmas(self):
+        size = self.vector_size
+        return self.key[size:]
+
     def _binarize(self, a, size):
         b = str(bin(int(a)))
         if b[0] == '-':
@@ -87,3 +101,11 @@ class Individual(object):
                 b = '0' + b
             b = '+' + b
         return b
+
+    def uniformise_sigma(self):
+        length = len(self.key)
+        for i in range(length / 2, length):
+            if i == length / 2:
+                sigma = self._key[i][0]
+            else:
+                self._key[i] = (sigma, 'ackley_sigma')

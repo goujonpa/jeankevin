@@ -140,28 +140,55 @@ def set_AklI_settings():
     os.system("clear")
 
     if preset == 1:
-        options["iterations"] = int(2000)
-        options["stopFitness"] = float(0.80)
+        options["iterations"] = int(50)
+        options["stopFitness"] = float(0.70)
         options["base"] = int(8)
-        options['verbose'] = False
+        options['verbose'] = True
         options['selectionMode'] = int(1)
+        options['mutationMode'] = '1LR1S'
+        options['recombinationMode'] = 'best'
 
     elif preset == 2:
-        print("\nBASICS")
-        x = int(raw_input("Stop Iterations Number:\n"))
+        print('\nBASICS')
+        x = int(raw_input('Stop Iterations Number:\n'))
         options["iterations"] = int(x) - 1
 
-        options['stopFitness'] = float(raw_input("\nStop Fitness:\n"))
+        options['stopFitness'] = float(raw_input('\nStop Fitness:\n'))
 
         print("\nGENERATIONS")
 
         options["base"] = int(raw_input(
-            "n setting:\n"
-            "lambda (number of child from the father) = 8 * n\n"
-            "mu (number of best child selected to make new father) = lambda / 4\n"
-            "t (global step size) = 1 / (n)^(1/2)\n"
-            "ti (component step size) = 1 / (n)^(1/4)\n"
+            'n setting:\n'
+            'lambda (number of child from the father) = 8 * n\n'
+            'mu (number of best child selected to make new father) = lambda / 4\n'
+            't (global step size) = 1 / (n)^(1/2)\n'
+            'ti (component step size) = 1 / (n)^(1/4)\n'
         ))
+
+        print('RECOMBINATION')
+        options['recombinationMode'] = int(raw_input(
+           'Recombination mode:\n'
+           '1- Intermediate\n'
+           '2- Select Best\n'
+           '3- Weighted\n'
+        ))
+        if options['recombinationMode'] == 1:
+            options['recombinationMode'] = 'intermediate'
+        elif options['recombinationMode'] == 2:
+            options['recombinationMode'] = 'best'
+        elif options['recombinationMode'] == 3:
+            options['recombinationMode'] = 'weighted'
+
+        print('MUTATION')
+        options['mutationMode'] = int(raw_input(
+           'Mutation mode:\n'
+           '1- 2 Learning Rates, N Sigmas\n'
+           '2- 1 Learning Rate, 1 Sigma\n'
+        ))
+        if options['mutationMode'] == 1:
+            options['mutationMode'] = '2LRNS'
+        elif options['mutationMode'] == 2:
+            options['mutationMode'] = '1LR1S'
 
         print("\nVERBOSE")
         options["verbose"] = int(raw_input(

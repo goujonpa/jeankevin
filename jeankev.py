@@ -12,8 +12,15 @@
 ######################################################
 
 from modules.populationClass import *
+import os
 
-choice = int(raw_input("1 OU 2 ?"))
+os.system('clear')
+
+choice = int(raw_input(
+    'GA or ES\n'
+    '--> 1: GA\n'
+    '--> 2: ES\n'
+))
 if choice == 1:
     population = Population('NumberCouple')
     population.run_GA()
