@@ -42,6 +42,7 @@ class Population(object):
         return self._settings['maximalPopulation']
 
     def _empty_population(self):
+        self._empty_extrems()
         self._population = list()
 
     @property
@@ -213,7 +214,8 @@ class Population(object):
             self._save_iterations.append(j)
             self._save_fitness_sums.append(self.fitness_sums)
             self._save_maximums.append(self.best.fitness)
-            self._recombination_ES_Nx_Nsigma_inter()
+            self._recombination_ES_select_best_YOLO()
+            self.display()
             i += 1
 
         best = self.best
@@ -279,7 +281,7 @@ class Population(object):
 
         self.display()
 
-        if newIndividual.fitness > self.stop_fitness:
+        if newIndividual.fitness >= self.stop_fitness:
             return newIndividual
         else:
             return 1
@@ -486,6 +488,7 @@ class Population(object):
         population = self.population
         population_size = self.population_size
         key_length = len(population[0][0].key)
+
         new_key = list()
         for (individual, fitness) in population:
             for i in range(0, key_length):
@@ -495,11 +498,37 @@ class Population(object):
                     new_key.append([individual.key[i][0], 'ackley_sigma'])
                 else:
                     new_key[i][0] += individual.key[i][0]
-        new_key = [(x / population_size, y) for x, y in new_key]
+
+        new_key = [(float(x / population_size), y) for x, y in new_key]
+        new_father = AckleyIndividual(new_key)
+
+        self._empty_population()
+        result = self._store(new_father)
+        return result
+
+    def _recombination_ES_Nx_Nsigma_weighted(self):  # TO IMPLEMENT MG
+        population = self.population
+        population_size = self.population_size
+        key_length = len(population[0][0].key)
+        new_key = list()
+        for (individual, fitness) in population:
+            for i in range(0, key_length):
+                if len(new_key) <= i and i < (key_length / 2):
+                    new_key.append([individual.key[i][0], 'ackley_x'])
+                elif len(new_key) <= i:
+                    new_key.append([individual.key[i][0], 'ackley_sigma'])
+                else:
+                    new_key[i][0] += individual.key[i][0]
+        new_key = [(float(x / population_size), y) for x, y in new_key]
         new_father = AckleyIndividual(new_key)
         self._empty_population()
-        self._empty_extrems()
         result = self._store(new_father)
+        return result
+
+    def _recombination_ES_select_best_YOLO(self):
+        best = self.best
+        self._empty_population()
+        result = self._store(best)
         return result
 
     def _mutation_ES_Nx_Nsigma_gauss_2LR(self):
@@ -516,6 +545,29 @@ class Population(object):
                 zk = float(random.gauss(0, 1))
                 sigma = float(individual.key[30+j][0])
                 sigma = float(sigma) * float(math.exp(local_step_size + global_step_size))
+                list_sigma.append((sigma, 'ackley_sigma'))
+                xi = individual.key[j][0] + float(sigma * zk)
+                list_xi.append((xi, 'ackley_x'))
+            new_key = list_xi + list_sigma
+            new_individual = AckleyIndividual(new_key)
+            result = self._store(new_individual)
+        return result
+
+    def _mutation_ES_Nx_1sigma_gauss_1LR(self):  # to implement !!!
+        individual = self.population[0][0]
+        vector_size = len(individual.key)/2
+
+        # need to have juste 1 sigma in my child -> would be better at the beginning of run_ES
+
+        for i in range(0, self.child_number):
+            global_step_size = float(self.global_learning_rate * random.gauss(0, 1))
+            list_sigma = list()
+            list_xi = list()
+
+            for j in range(0, vector_size):
+                zk = float(random.gauss(0, 1))
+                sigma = float(individual.key[30+j][0])
+                sigma = float(sigma) * float(math.exp(global_step_size))
                 list_sigma.append((sigma, 'ackley_sigma'))
                 xi = individual.key[j][0] + float(sigma * zk)
                 list_xi.append((xi, 'ackley_x'))

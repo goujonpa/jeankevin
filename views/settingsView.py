@@ -118,17 +118,13 @@ def set_NCpl_settings():
             options['verbose'] = True
 
         os.system("clear")
-
-
     return options
 
 
 def set_AklI_settings():
-
     os.system("clear")
-
     print(
-        "\n---> Ackley Function Individual\n"
+        "---> Ackley Function Individual\n"
         "\n===== OPTIONS =====\n"
     )
 
@@ -144,10 +140,10 @@ def set_AklI_settings():
     os.system("clear")
 
     if preset == 1:
-        options["iterations"] = int(50)
+        options["iterations"] = int(2000)
         options["stopFitness"] = float(0.80)
         options["base"] = int(8)
-        options['verbose'] = True
+        options['verbose'] = False
         options['selectionMode'] = int(1)
 
     elif preset == 2:
