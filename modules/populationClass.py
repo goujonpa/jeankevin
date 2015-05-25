@@ -29,8 +29,10 @@ class Population(object):
         self._save_iterations = list()
         self._save_maximums = list()
         self._save_fitness_sums = list()
+        self._save_sigma_value = list()
         self._population = list()
         self._view = dict()
+        self._sigma_count = 0
         self._initialise()
 
     # ========== PROPERTIES & BASIC METHODS ==========
@@ -157,6 +159,14 @@ class Population(object):
     def recombination_mode(self):
         return self._settings['recombinationMode']
 
+    @property
+    def sigma_boost(self):
+        return self._settings['sigmaBoost']
+
+    @property
+    def sigma_count(self):
+        return self._sigma_count
+
     def enable_verbose(self):
         self._settings['verbose'] = True
 
@@ -200,7 +210,7 @@ class Population(object):
                 if newIndividual.fitness < self.stop_fitness:
                     self._store(newIndividual)
                 else:
-                    i = i - 1
+                    i -= 1
         elif self.individuals_type == 'AckleyIndividual':
             adam = AckleyIndividual()
             result = self._store(adam)
@@ -224,14 +234,16 @@ class Population(object):
             result2 = self._store(self._mutation_GA(result[1]))
             result = (result1, result2)
 
-            i = i + 1
+            i += 1
             self._save_iterations.append(i)
             self._save_fitness_sums.append(self.fitness_sums)
             self._save_maximums.append(self.best.fitness)
 
         best = self.best
         print("\n\nBest:\n{} : fitness = {}".format(best.key, best.fitness))
-        vSave.save_figure(self._save_iterations, self._save_fitness_sums, self._save_maximums, 'simuGA')
+        mesures['max'] = self._save_maximums
+        mesures['fitness'] = self._save_fitness_sums
+        vSave.save_figure(self._save_iterations, mesures, 'simuGA')
 
     def _store(self, newIndividual):
         self.empty_view()
@@ -414,7 +426,7 @@ class Population(object):
             text = '4- key[' + str(i) + '] after potential mutation'
             self.addview(text, string)
             mutated_child.append(string)
-            i = i + 1
+            i += 1
 
         if mode == 'binary':
             child = child.get_binary_unstandardized(mutated_child)
@@ -469,23 +481,38 @@ class Population(object):
     def run_ES(self):
         # Initialisation done by initialise()
         i = 0
+        mesures = dict()
+
         while i < self.stop_iteration and self.max_fitness < self.stop_fitness:
             self._current_iteration = i
             self._save_iterations.append(i)
             self._save_fitness_sums.append(self.fitness_sums)
             self._save_maximums.append(self.best.fitness)
+            self._save_sigma_value.append(self.best.average_sigma)
             self._mutation_ES()  # Self-adapted
             j = i + 0.5
 
             self._save_iterations.append(j)
             self._save_fitness_sums.append(self.fitness_sums)
             self._save_maximums.append(self.best.fitness)
+            self._save_sigma_value.append(self.best.average_sigma)
             self._recombination_ES()
+            if self.sigma_boost is True and not self.best.fitness > self._save_maximums[-1]:
+                if self.sigma_count < 5:
+                    self._sigma_count += 1
+                else:
+                    self._sigma_count = 0
+                    self._population[0][0].sigma_boost()
+            elif self.sigma_boost is True:
+                self._sigma_count = 0
             i += 1
 
         best = self.best
         print("\n\nBest:\n{} : fitness = {}".format(best.key, best.fitness))
-        vSave.save_figure(self._save_iterations, self._save_fitness_sums, self._save_maximums, 'simuES')
+        mesures['max'] = self._save_maximums
+        mesures['fitness'] = self._save_fitness_sums
+        mesures['sigma'] = self._save_sigma_value
+        vSave.save_figure(self._save_iterations, mesures, 'simuES')
 
     def _recombination_ES(self):
         if self.recombination_mode == 'intermediate':
@@ -493,9 +520,11 @@ class Population(object):
         elif self.recombination_mode == 'best':
             self._recombination_ES_best()
         elif self.recombination_mode == 'weighted':
-            self_recombination_ES_weighted()
+            self._recombination_ES_weighted()
 
     def _recombination_ES_intermediate(self):
+        self.empty_view()
+        self.addview('title', 'RECOMBINATION INTERMEDIATE')
         population = self.population
         population_size = self.population_size
         key_length = len(population[0][0].key)
@@ -511,30 +540,36 @@ class Population(object):
                     new_key[i][0] += individual.key[i][0]
 
         new_key = [(float(x / population_size), y) for x, y in new_key]
+        self.addview('New individual xs', [x for (x, y) in new_key[0:(len(new_key) / 2)]])
+        self.addview('New individual sigmas', [x for (x, y) in new_key[(len(new_key) / 2):]])
         new_father = AckleyIndividual(new_key)
-
         self._empty_population()
         result = self._store(new_father)
-        return result
+        self.display()
 
     def _recombination_ES_weighted(self):  # TO IMPLEMENT MG
+        self.empty_view()
+        self.addview('title', 'RECOMBINATION WEIGHTED')
         population = self.population
-        population_size = self.population_size
         key_length = len(population[0][0].key)
         new_key = list()
+
         for (individual, fitness) in population:
             for i in range(0, key_length):
                 if len(new_key) <= i and i < (key_length / 2):
-                    new_key.append([individual.key[i][0], 'ackley_x'])
+                    new_key.append([(individual.key[i][0] * individual.fitness), 'ackley_x'])
                 elif len(new_key) <= i:
-                    new_key.append([individual.key[i][0], 'ackley_sigma'])
+                    new_key.append([(individual.key[i][0] * individual.fitness), 'ackley_sigma'])
                 else:
-                    new_key[i][0] += individual.key[i][0]
-        new_key = [(float(x / population_size), y) for x, y in new_key]
+                    new_key[i][0] += (individual.key[i][0] * individual.fitness)
+
+        new_key = [(float(x / self.fitness_sums), y) for x, y in new_key]
+        self.addview('New individual xs', [x for (x, y) in new_key[0:(len(new_key) / 2)]])
+        self.addview('New individual sigmas', [x for (x, y) in new_key[(len(new_key) / 2):]])
         new_father = AckleyIndividual(new_key)
         self._empty_population()
         result = self._store(new_father)
-        return result
+        self.display()
 
     def _recombination_ES_best(self):
         self.empty_view()
@@ -553,35 +588,12 @@ class Population(object):
             self._mutation_ES_2LRNS()
 
     def _mutation_ES_2LRNS(self):  # pretty weird results....????!
-        individual = self.parent
-        vector_size = individual.vector_size
-
-        for i in range(0, self.child_number):
-            global_step_size = float(self.global_learning_rate * random.gauss(0, 1))
-            list_sigma = list()
-            list_xi = list()
-
-            for j in range(0, vector_size):
-                local_step_size = float(self.local_learning_rate * random.gauss(0, 1))
-                zk = float(random.gauss(0, 1))
-                sigma = float(individual.key[30+j][0])
-                sigma = float(sigma) * float(math.exp(local_step_size + global_step_size))
-                list_sigma.append((sigma, 'ackley_sigma'))
-                xi = individual.key[j][0] + float(sigma * zk)
-                list_xi.append((xi, 'ackley_x'))
-            new_key = list_xi + list_sigma
-            new_individual = AckleyIndividual(new_key)
-            result = self._store(new_individual)
-        return result
-
-    def _mutation_ES_1LR1S(self):  # to implement !!!
         self.empty_view()
-        self.addview('title', 'MUTATION 1LR1S')
+        self.addview('title', 'MUTATION 2LRNS')
         individual = self.parent
         vector_size = individual.vector_size
-        individual.uniformise_sigma()
-        self.addview('0- xi Before mutation', [x for (x, y) in individual.xi])
-        self.addview('0- sigmas Before mutation', [x for (x, y) in individual.sigmas])
+        self.addview('0- Individual xs before mutation', [x for (x, y) in individual.xi])
+        self.addview('0- Individual sigmas before mutation', [x for (x, y) in individual.sigmas])
         self.addview('0- Global learning rate:', self.global_learning_rate)
 
         for i in range(0, self.child_number):
@@ -589,15 +601,50 @@ class Population(object):
             self.addview('1- Global step size', global_step_size)
             list_sigma = list()
             list_xi = list()
+
+            for j in range(0, vector_size):
+                local_step_size = float(random.gauss(0, 1) * self.local_learning_rate)
+                sigma = float(individual.key[30+j][0])
+                sigma = sigma * float(math.exp(global_step_size + local_step_size))
+                list_sigma.append((sigma, 'ackley_sigma'))
+                xi = float(individual.key[j][0]) + float(sigma * random.gauss(0, 1))
+                list_xi.append((xi, 'ackley_x'))
+
+            new_key = list_xi + list_sigma
+            self.addview('2- New child xs', [x for (x, y) in list_xi])
+            self.addview('3- New child sigmas', [x for (x, y) in list_sigma])
+            new_individual = AckleyIndividual(new_key)
+            self.addview('4- New fitness', new_individual.fitness)
+            self.display()
+            self._store(new_individual)
+            self.empty_view()
+            self.addview('title', 'MUTATION 1LR1S')
+
+    def _mutation_ES_1LR1S(self):
+        self.empty_view()
+        self.addview('title', 'MUTATION 1LR1S')
+        individual = self.parent
+        vector_size = individual.vector_size
+        individual.uniformise_sigma()
+        self.addview('0- Individual xs Before mutation', [x for (x, y) in individual.xi])
+        self.addview('0- Individual sigma Before mutation', [x for (x, y) in individual.sigmas[0:1]])
+        self.addview('0- Global learning rate:', self.global_learning_rate)
+
+        for i in range(0, self.child_number):
+            global_step_size = float(self.global_learning_rate * random.gauss(0, 1))
+            self.addview('1- Global step size', global_step_size)
+            list_sigma = list()
+            list_xi = list()
+
             for j in range(0, vector_size):
                 sigma = float(individual.key[30+j][0])
                 sigma = sigma * float(math.exp(global_step_size))
                 list_sigma.append((sigma, 'ackley_sigma'))
-                xi = float(individual.key[j][0]) + sigma
+                xi = float(individual.key[j][0]) + float(sigma * random.gauss(0, 1))
                 list_xi.append((xi, 'ackley_x'))
-            new_key = list_xi + list_sigma
 
-            self.addview('2- New child x', [x for (x, y) in list_xi])
+            new_key = list_xi + list_sigma
+            self.addview('2- New child xs', [x for (x, y) in list_xi])
             self.addview('3- New child sigma', [x for (x, y) in list_sigma[0:1]])
             new_individual = AckleyIndividual(new_key)
             self.addview('4- New fitness', new_individual.fitness)

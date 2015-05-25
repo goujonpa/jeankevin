@@ -56,11 +56,11 @@ class AckleyIndividual(Individual):
         key = list()
         for i in range(0, self.dimension):
             random_real = random.uniform(-15.0, 15.0)
-            key.append((random_real, 'ackley_x'))
+            key.append((random_real, 'x'))
 
         for i in range(0, self.dimension):
-            random_real = random.uniform(0, 1)
-            key.append((random_real, 'ackley_sigma'))
+            random_real = random.uniform(10, 20)
+            key.append((random_real, 'sigma'))
         return key
 
     def _calcul_fitness(self):

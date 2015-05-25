@@ -140,13 +140,14 @@ def set_AklI_settings():
     os.system("clear")
 
     if preset == 1:
-        options["iterations"] = int(50)
-        options["stopFitness"] = float(0.70)
-        options["base"] = int(8)
-        options['verbose'] = True
+        options["iterations"] = int(1000)
+        options["stopFitness"] = float(0.99)
+        options["base"] = int(10)
+        options['verbose'] = False
         options['selectionMode'] = int(1)
-        options['mutationMode'] = '1LR1S'
-        options['recombinationMode'] = 'best'
+        options['mutationMode'] = '2LRNS'
+        options['recombinationMode'] = 'intermediate'
+        options['sigmaBoost'] = True
 
     elif preset == 2:
         print('\nBASICS')
@@ -189,6 +190,18 @@ def set_AklI_settings():
             options['mutationMode'] = '2LRNS'
         elif options['mutationMode'] == 2:
             options['mutationMode'] = '1LR1S'
+
+        print('SIGMA BOOST')
+        options['sigmaBoost'] = int(raw_input(
+           'Allow sigma boost YOLO special feature ?\n'
+           '1- sigma nitro enabled\n'
+           '2- sigma nitro disabled\n'
+        ))
+        if options['sigmaBoost'] == 1:
+            options['sigmaBoost'] = True
+        elif options['sigmaBoost'] == 2:
+            options['sigmaBoost'] = False
+
 
         print("\nVERBOSE")
         options["verbose"] = int(raw_input(

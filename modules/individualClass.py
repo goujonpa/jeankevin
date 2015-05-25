@@ -2,6 +2,7 @@
 # -*-coding:Utf-8 -*
 
 from abc import ABCMeta, abstractmethod
+import random
 
 
 class Individual(object):
@@ -77,6 +78,14 @@ class Individual(object):
         size = self.vector_size
         return self.key[size:]
 
+    @property
+    def average_sigma(self):
+        size = self.vector_size
+        sigmas = self.sigmas
+        sigmas = [x for (x, y) in sigmas]
+        sum_sigmas = sum(sigmas)
+        return (float(sum_sigmas) / float(size))
+
     def _binarize(self, a, size):
         b = str(bin(int(a)))
         if b[0] == '-':
@@ -109,3 +118,11 @@ class Individual(object):
                 sigma = self._key[i][0]
             else:
                 self._key[i] = (sigma, 'ackley_sigma')
+
+    def sigma_boost(self):
+        size = self.vector_size
+        new_key = self.key[0:size]
+        for i in range(0, size):
+            random_real = random.uniform(0, 1)
+            new_key.append((random_real, 'sigma'))
+        self._key = new_key
