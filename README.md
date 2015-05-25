@@ -9,12 +9,12 @@ Please note that I've chosen to do that Object python in order to learn the lang
 
 ## Tree
 
-'''
+```
 /jeankevin
   /modules : class & module sources
   /views : any view management script (console/pdf)
   /doc : documentation & school report
-'''
+```
   
   
 ## Features
