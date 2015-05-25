@@ -1,5 +1,7 @@
 # Jeankevin
+
 Genetic Algorithms & Evolutionary Strategies implementations : School project in python (OOP)
+
 PEP 8 conformance
 
 ## Objective
