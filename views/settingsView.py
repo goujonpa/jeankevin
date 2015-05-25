@@ -70,14 +70,14 @@ def set_NCpl_settings():
 
         options['crossMode'] = int(raw_input(
             'Crossover Mode:\n'
-            '--> 1: One random one point\n'
+            '--> 1: One random point\n'
         ))
         if options['crossMode'] == 1:
             options['crossMode'] = 'randomOnePoint'
 
         options['mutationMode'] = int(raw_input(
             'Mutation Mode:\n'
-            '-> 0: Swap mode (only for real mode)\n'
+            '-> 0: Swap mode\n'
             '-> 1: Each nucleotid has a chance to be muted, one by one\n'
             '-> 2: 1 mutation maximum by child\n'
         ))

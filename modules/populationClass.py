@@ -224,6 +224,7 @@ class Population(object):
         self._save_iterations.append(i)
         self._save_fitness_sums.append(self.fitness_sums)
         self._save_maximums.append(self.best.fitness)
+        mesures = dict()
 
         while result == (1, 1) and i < self.stop_iteration:
             self._current_iteration = i
@@ -341,8 +342,8 @@ class Population(object):
             child1 = parent1.get_binary_unstandardized(childs[0])
             child2 = parent1.get_binary_unstandardized(childs[1])
         elif mode == 'real':
-            child1 = parent1.get_binary_unstandardized(childs[0])
-            child2 = parent1.get_binary_unstandardized(childs[1])
+            child1 = parent1.get_real_unstandardized(childs[0])
+            child2 = parent1.get_real_unstandardized(childs[1])
 
         self.addview('5- Unstandardized Child #1', child1)
         self.addview('5- Unstandardized Child #2', child2)
@@ -444,7 +445,7 @@ class Population(object):
     def _mutation_GA_swap(self, string, size, min_position, max_position, mutation_probability):
         a = 0
         b = 0
-        while a == b and b < a:
+        while a >= b:
             a = random.randint(min_position, max_position)
             b = random.randint(min_position, max_position)
         string = string[0:a] + string[b] + string[a+1:b] + string[a] + string[b+1:]
@@ -476,7 +477,7 @@ class Population(object):
             elif crossmode == 'real':
                 char = str(random.randint(0, 9))
             string = string[0:i] + char + string[i+1:]
-            return string
+        return string
 
     def run_ES(self):
         # Initialisation done by initialise()
