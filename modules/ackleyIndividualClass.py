@@ -7,10 +7,9 @@ import random
 
 
 class AckleyIndividual(Individual):
-    """Ackley Individual class
-    Inherits from Individual class
+    """Ackley Individual class : represents one ackley individual, inherits from Individual class
 
-    Attributes:
+    Properties:
     _key : is a list(x1, x2)
     _fitness : = 1/1+f(x) with f(x) = 100(x2 - x1^2)^2 + (x1 - 1)^2
 

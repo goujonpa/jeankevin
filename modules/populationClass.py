@@ -42,6 +42,7 @@ class Population(object):
     sigma_count
     current_iteration
     view
+    remise
 
     Methods:
     _empty_population()
@@ -57,8 +58,11 @@ class Population(object):
     _store()
     _selectOne()
     _roulette_selection()
+    _roulette_without_replacement()
+    _tournament_selection()
     _crossover()
     _cross_random_one_point()
+    -_cross_random_multipoint()
     _mutation_GA()
     _mutation_GA_swap()
     _mutation_GA_every_nucleotid()
@@ -92,6 +96,7 @@ class Population(object):
         self._population = list()
         self._view = dict()
         self._sigma_count = 0
+        self._remise = list()
         self._initialise()
 
     # ========== PROPERTIES & BASIC METHODS ==========
@@ -291,6 +296,10 @@ class Population(object):
         """Returns the number of the current_iteration"""
         return self._current_iteration
 
+    @property
+    def remise(self):
+        return self._remise
+
     # ========== GA & ES Algorithms ==========
 
     def _initialise(self):  # could be more generic
@@ -326,6 +335,10 @@ class Population(object):
             self._current_iteration = i
             parent1 = self._selectOne()
             parent2 = self._selectOne()
+            if not len(self.remise) == 0:
+                for element in self.remise:
+                    self._store(element)
+                self._remise = list()
             result = self._crossover(parent1, parent2)
             result1 = self._store(self._mutation_GA(result[0]))
             result2 = self._store(self._mutation_GA(result[1]))
@@ -382,21 +395,37 @@ class Population(object):
         """Selects one individual, in function of the selection_mode chosen"""
         if self.selection_mode == 'roulette':
             return self._roulette_selection()
-        elif self.selection_mode == 'turnament':
+        elif self.selection_mode == 'tournament':
             return self._tournament_selection()
+        elif self.selection_mode == 'rouletteWR':
+            return self._roulette_without_replacement()
 
-    def _tournament_selection():
-        # sorted_pop = sorted(pop)
-        # best = en haut
-        # population = le reste
-        # return le best (A REMETTRE DANS LA POPULATION IMMEDIATEMENT APRES SELECTION DES DEUX DANS LE MAIN)
-        return 1
+    def _tournament_selection(self):
+        """Returns one individual, selected with the tournament algorithm"""
+        self.empty_view()
+        self.addview('title', 'SELECTION BY TOURNAMENT')
+        sorted_population = sorted(self.population, key=operator.itemgetter(1))
+        best = sorted_population[-1][0]
+        self.addview('Selected', best.key)
+        self.addview('Fitness', best.fitness)
+        self._remise.append(best)
+        self._population = sorted_population[0:-1]
+        self.display()
+        return best
 
-    def _roulette_without_replacement():
-        # roulette
-        # pop
-        # replacement après coup
-        return 1
+    def _roulette_without_replacement(self):
+        """Returns one individual, selected with the roulette wheel algorithm, without replacement"""
+        self.empty_view()
+        selected = self._roulette_selection()
+        if len(self.remise) == 0:
+            self._remise.append(selected)
+        else:
+            while selected == self.remise[0]:
+                selected = self._roulette_selection()
+            self._remise = list()
+        self.addview('title', 'SELECTION BY ROULETTE WITHOUT REPLACEMENT')
+        self.display()
+        return selected
 
     def _roulette_selection(self):
         """Returns one individual, selected with the roulette wheel algorithm"""
@@ -425,7 +454,8 @@ class Population(object):
                 self.addview('Individual Key', individual.key)
                 break
 
-        self.display()
+        if not self.selection_mode == 'rouletteWR':
+            self.display()
         return individual
 
     def _crossover(self, parent1, parent2):
@@ -450,6 +480,8 @@ class Population(object):
         crossover_mode = self.crossmode
         if crossover_mode == 'randomOnePoint':
             childs = self._cross_random_one_point(standard_parent1, standard_parent2)
+        elif crossover_mode == 'randomMultiPoint':
+            childs = self._cross_random_multipoint(standard_parent1, standard_parent2)
 
         if mode == 'binary':
             child1 = parent1.get_binary_unstandardized(childs[0])
@@ -499,11 +531,44 @@ class Population(object):
 
         return (child1, child2)
 
-    def _cross_random_multipoint():
-        # parcourir string
-        # a chaque avancée : switch ? oui ? non ?
-        # puis déstandardiser
-        return 1
+    def _cross_random_multipoint(self, standard_parent1, standard_parent2):
+        """Provides two child crossing two parents with the random multipoint crossover algorithm"""
+
+        length1 = len(standard_parent1)
+        length2 = len(standard_parent2)  # if difference, exception
+
+        child1 = list()
+        child2 = list()
+
+        for i in range(0, length1):
+
+            string1, size1, min_position1, max_position1 = standard_parent1[i]
+            string2, size2, min_position2, max_position2 = standard_parent2[i]  # if not equal raise exception
+
+            newstring1 = string1[0:min_position1]
+            newstring2 = string2[0:min_position2]
+
+            for i in range(min_position1, max_position1):
+                case = random.randint(1, 2)
+                if case == 1:
+                    newstring1 += string1[i]
+                    newstring2 += string2[i]
+                elif case == 2:
+                    newstring1 += string2[i]
+                    newstring2 += string1[i]
+
+            newstring1 += string1[max_position1:]
+            newstring2 += string2[max_position2:]
+
+            text = '4- Child #1 - Key[' + str(i) + '] - After crossover'
+            self.addview(str(text), newstring1)
+            text = '4- Child #2 - Key[' + str(i) + '] - After crossover'
+            self.addview(str(text), newstring2)
+
+            child1.append(newstring1)
+            child2.append(newstring2)
+
+        return (child1, child2)
 
     def _mutation_GA(self, child):
         """Mutates one child in function of the mutation_mode chosen"""

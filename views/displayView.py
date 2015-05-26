@@ -7,7 +7,7 @@ import operator as op
 
 def display(element, verbose=1, iteration_info=0):
     if verbose == 1 and type(element) == dict:
-        print("\n=== {} ===\n\n".format(element['title']))
+        print("=== {} ===\n\n".format(element['title']))
         for (key, value) in sorted(element.items(), key=op.itemgetter(0)):
             if not key == 'title':
                 print("- {} : {}".format(key, value))

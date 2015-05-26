@@ -7,14 +7,13 @@ import math
 
 def set_NCpl_settings():
 
+    options = {}
     os.system("clear")
 
     print(
         "---> NumberCouple Individual\n"
         "\n===== OPTIONS =====\n"
     )
-
-    options = {}
 
     preset = int(raw_input(
         "PRESET\n"
@@ -26,23 +25,29 @@ def set_NCpl_settings():
     os.system("clear")
 
     if preset == 1:
-        options["iterations"] = int(1000000)
-        options["stopFitness"] = float(1)
+        options["iterations"] = int(10000)
+        options["stopFitness"] = float(0.95)
         options["mode"] = 'binary'
-        options['crossMode'] = 'randomOnePoint'
+        options['crossMode'] = 'randomMultiPoint'
         options["maximalPopulation"] = int(50)
         options["mutationMode"] = 'everyNucleotid'
         options["mutationProbability"] = float(2)
         options["verbose"] = False
         options["initialPopulation"] = int(100)
-        options['selectionMode'] = 'roulette'
+        options['selectionMode'] = 'tournament'
 
     elif preset == 2:
-        print('BASICS')
-        x = int(raw_input('Stop Iterations Number:\n'))
-        options['iterations'] = int(x)
 
-        options['stopFitness'] = float(raw_input('\nStop Fitness:\n'))
+        print('BASICS')
+
+        x = int(raw_input(
+            'Stop Iterations Number:\n'
+        ))
+        options['iterations'] = int(x)
+        options['stopFitness'] = float(raw_input(
+            'Stop Fitness:\n'
+        ))
+
         os.system('clear')
 
         print('SELECTION')
@@ -50,9 +55,15 @@ def set_NCpl_settings():
         options['selectionMode'] = int(raw_input(
             '\nSelection Method:\n'
             '--> 1: Roulette method\n'
+            '--> 2: Tournament method\n'
+            '--> 3: Roulette without replacement method\n'
         ))
         if options['selectionMode'] == 1:
             options['selectionMode'] = 'roulette'
+        elif options['selectionMode'] == 2:
+            options['selectionMode'] = 'tournament'
+        elif options['selectionMode'] == 3:
+            options['selectionMode'] = 'rouletteWR'
 
         os.system('clear')
 
@@ -70,10 +81,13 @@ def set_NCpl_settings():
 
         options['crossMode'] = int(raw_input(
             'Crossover Mode:\n'
-            '--> 1: One random point\n'
+            '--> 1: random one point\n'
+            '--> 2: random multipoint\n'
         ))
         if options['crossMode'] == 1:
             options['crossMode'] = 'randomOnePoint'
+        elif options['crossMode'] == 2:
+            options['crossMode'] = 'randomMultiPoint'
 
         options['mutationMode'] = int(raw_input(
             'Mutation Mode:\n'
@@ -96,17 +110,20 @@ def set_NCpl_settings():
 
         os.system('clear')
 
-        print("\nPOPULATION")
+        print("POPULATION")
+
         options["maximalPopulation"] = int(raw_input(
             "Maximal Population:\n"
             "-> n > 0: elitist insertion, just keep n best individuals\n"
             "-> Other: every individual is kept (can slow down the algorythm for several iterations)\n"
         ))
 
-        options["initialPopulation"] = int(raw_input("\nInitialise with how much individuals ?\n"))
+        options["initialPopulation"] = int(raw_input("Initialise with how much individuals ?\n"))
+
         os.system("clear")
 
         print("\nVERBOSE")
+
         options["verbose"] = int(raw_input(
             "Verbose Mode\n"
             "-> 1: Enabled\n"
@@ -118,6 +135,7 @@ def set_NCpl_settings():
             options['verbose'] = True
 
         os.system("clear")
+
     return options
 
 
