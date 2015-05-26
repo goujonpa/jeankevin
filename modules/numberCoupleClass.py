@@ -49,7 +49,7 @@ class NumberCouple(Individual):
         x1, x2 = self.key
         x1 = 1000 * x1[0]
         x2 = 1000 * x2[0]
-        result = []
+        result = list()
         result.append((self._binarize(x1, 12), 15, 3, 14))
         result.append((self._binarize(x2, 12), 15, 3, 14))
         return result
@@ -59,7 +59,7 @@ class NumberCouple(Individual):
         x1, x2 = self.key
         x1 = 1000 * x1[0]
         x2 = 1000 * x2[0]
-        result = []
+        result = list()
         result.append((self._realize(x1, 12), 13, 9, 12))
         result.append((self._realize(x2, 12), 13, 9, 12))
         return result

@@ -52,30 +52,43 @@ class AckleyIndividual(Individual):
         """Returns the c2 parameter of the Ackley function"""
         return self._c2
 
-    @property
-    def dimension(self):
-        """Returns the dimension parameter of the Ackley function"""
-        return self._dimension
-
     def get_binary_standard(self):
         """Implemented soon"""
-        # pour tous les x : * 1000 comme dhab, fixer les chiffres
-        # pour tous les lambda : idem
-        return None
+        result = list()
+        for i in range(0, self.dimension):
+            value = self.key[i][0]
+            value = int(1000 * value)
+            result.append((self._binarize(value, 16), 19, 3, 18))
+        return result
 
     def get_real_standard(self):
         """Soon"""
-        return None
+        result = list()
+        for i in range(0, self.dimension):
+            value = self.key[i][0]
+            value = int(1000 * value)
+            result.append((self._realize(value, 16), 17, 12, 16))
+        return result
 
     @staticmethod
     def get_binary_unstandardized(l):
         """Soon"""
-        return None
+        key = list()
+        for element in l:
+            a = int(element, 2)
+            a = a / 1000.0
+            key.append((a, 'real'))
+        return key
 
     @staticmethod
     def get_real_unstandardized(l):
         """Soon"""
-        return None
+        key = list()
+        for element in l:
+            a = int(element)
+            a = a / 1000.0
+            key.append((a, 'real'))
+        return key
 
     def _random_initialisation(self):
         """Randomly initialises an AckleyIndividual"""

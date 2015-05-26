@@ -25,16 +25,16 @@ def set_NCpl_settings():
     os.system("clear")
 
     if preset == 1:
-        options["iterations"] = int(10000)
-        options["stopFitness"] = float(0.95)
-        options["mode"] = 'binary'
+        options["iterations"] = int(100000)
+        options["stopFitness"] = float(0.90)
+        options["mode"] = 'real'
         options['crossMode'] = 'randomMultiPoint'
-        options["maximalPopulation"] = int(50)
+        options["maximalPopulation"] = int(30)
         options["mutationMode"] = 'everyNucleotid'
         options["mutationProbability"] = float(2)
         options["verbose"] = False
-        options["initialPopulation"] = int(100)
-        options['selectionMode'] = 'tournament'
+        options["initialPopulation"] = int(300)
+        options['selectionMode'] = 'rouletteWR'
 
     elif preset == 2:
 

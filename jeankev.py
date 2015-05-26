@@ -19,8 +19,9 @@ os.system('clear')
 
 choice = int(raw_input(
     'GA or ES\n'
-    '--> 1: GA\n'
-    '--> 2: ES\n'
+    '--> 1: GA with NumberCouple\n'
+    '--> 2: ES with AckleyIndividual\n'
+    '--> 3: GA with AckleyIndividual\n'
 ))
 if choice == 1:
     population = Population('NumberCouple')
@@ -28,3 +29,6 @@ if choice == 1:
 elif choice == 2:
     population = Population('AckleyIndividual')
     population.run_ES()
+elif choice == 3:
+    population = Population('AckleyIndividualGA')
+    population.run_GA()

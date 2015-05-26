@@ -11,7 +11,6 @@ class Individual(object):
     Properties:
     key : standardized representation of the problem: [[x1, 'type']...[xn, 'type']]
     fitness
-    vector_size
     xi
     sigmas
     average_sigma
@@ -56,14 +55,14 @@ class Individual(object):
         self._fitness = self._calcul_fitness()
 
     @property
-    def vector_size(self):
-        """Returns the key list size, divided by two (useful for AckleyIndividuals)"""
-        return (len(self.key)/2)
-
-    @property
     def fitness(self):
         """Returns the individual's fitness"""
         return self._fitness
+
+    @property
+    def dimension(self):
+        """Returns the dimension parameter of the Ackley function"""
+        return self._dimension
 
     @fitness.setter
     def fitness(self, value):
@@ -96,24 +95,24 @@ class Individual(object):
 
     @property
     def xi(self):
-        """Returns the elements of a key until an index corresponding to the vector size property"""
-        size = self.vector_size
-        return self.key[0:size]
+        """Returns the elements of a key until an index corresponding to the dimension property"""
+        dimension = self.dimension
+        return self.key[0:dimension]
 
     @property
     def sigmas(self):
-        """Returns the elements of a key from an index corresponding to the vector size property to the end"""
-        size = self.vector_size
-        return self.key[size:]
+        """Returns the elements of a key from an index corresponding to the dimension property to the end"""
+        dimension = self.dimension
+        return self.key[dimension:]
 
     @property
     def average_sigma(self):
         """Returns the average of the values of elements returned by the sigmas property (Ackley-useful)"""
-        size = self.vector_size
+        dimension = self.dimension
         sigmas = self.sigmas
         sigmas = [x for (x, y) in sigmas]
         sum_sigmas = sum(sigmas)
-        return (float(sum_sigmas) / float(size))
+        return (float(sum_sigmas) / float(dimension))
 
     def _binarize(self, a, size):
         """Standardises a string of fixed size into binary representation"""
@@ -153,9 +152,9 @@ class Individual(object):
 
     def sigma_boost(self):
         """Re-initialise values of elements from the second half of the key (Ackley-useful)"""
-        size = self.vector_size
-        new_key = self.key[0:size]
-        for i in range(0, size):
+        dimension = self.dimension
+        new_key = self.xi
+        for i in range(0, dimension):
             random_real = random.uniform(0, 1)
             new_key.append((random_real, 'sigma'))
         self._key = new_key

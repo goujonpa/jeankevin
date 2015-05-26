@@ -189,6 +189,8 @@ class Population(object):
             return vSet.set_NCpl_settings()
         elif self.individuals_type == 'AckleyIndividual':
             return vSet.set_AklI_settings()
+        elif self.individuals_type == 'AckleyIndividualGA':  # TO CHANGE
+            return vSet.set_NCpl_settings()
 
     @property  # Could be incorporated to settings
     def individuals_type(self):
@@ -309,6 +311,7 @@ class Population(object):
         if self.verbose is True:
             self._disable_verbose()
             verbose = True
+
         if self.individuals_type == 'NumberCouple':
             for i in range(0, self.initial_population):
                 newIndividual = NumberCouple()
@@ -319,6 +322,11 @@ class Population(object):
         elif self.individuals_type == 'AckleyIndividual':
             adam = AckleyIndividual()
             result = self._store(adam)
+        elif self.individuals_type == 'AckleyIndividualGA':
+            for i in range(0, self.initial_population):
+                adam = AckleyIndividual()
+                result = self._store(adam)
+
         if verbose is True:
             self._enable_verbose()
         os.system('clear')
@@ -497,6 +505,9 @@ class Population(object):
         if self.individuals_type == 'NumberCouple':
             child1 = NumberCouple(child1)
             child2 = NumberCouple(child2)
+        elif self.individuals_type == 'AckleyIndividualGA':
+            child1 = AckleyIndividual(child1)
+            child2 = AckleyIndividual(child2)
 
         self.display()
 
@@ -623,6 +634,8 @@ class Population(object):
 
         if self.individuals_type == 'NumberCouple':
             child = NumberCouple(child)
+        elif self.individuals_type == 'AckleyIndividualGA':
+            child = AckleyIndividual(child)
 
         self.addview('5- Result', child.key)
         self.display()
@@ -788,7 +801,7 @@ class Population(object):
         self.empty_view()
         self.addview('title', 'MUTATION 2LRNS')
         individual = self.parent
-        vector_size = individual.vector_size
+        dimension = individual.dimension
         self.addview('0- Individual xs before mutation', [x for (x, y) in individual.xi])
         self.addview('0- Individual sigmas before mutation', [x for (x, y) in individual.sigmas])
         self.addview('0- Global learning rate:', self.global_learning_rate)
@@ -799,7 +812,7 @@ class Population(object):
             list_sigma = list()
             list_xi = list()
 
-            for j in range(0, vector_size):
+            for j in range(0, dimension):
                 local_step_size = float(random.gauss(0, 1) * self.local_learning_rate)
                 sigma = float(individual.key[30+j][0])
                 sigma = sigma * float(math.exp(global_step_size + local_step_size))
@@ -822,7 +835,7 @@ class Population(object):
         self.empty_view()
         self.addview('title', 'MUTATION 1LR1S')
         individual = self.parent
-        vector_size = individual.vector_size
+        dimension = individual.dimension
         individual.uniformise_sigma()
         self.addview('0- Individual xs Before mutation', [x for (x, y) in individual.xi])
         self.addview('0- Individual sigma Before mutation', [x for (x, y) in individual.sigmas[0:1]])
@@ -834,7 +847,7 @@ class Population(object):
             list_sigma = list()
             list_xi = list()
 
-            for j in range(0, vector_size):
+            for j in range(0, dimension):
                 sigma = float(individual.key[30+j][0])
                 sigma = sigma * float(math.exp(global_step_size))
                 list_sigma.append((sigma, 'ackley_sigma'))
