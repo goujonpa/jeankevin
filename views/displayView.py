@@ -6,6 +6,7 @@ import operator as op
 
 
 def display(element, verbose=1, iteration_info=0):
+    """Gets a dictionary and properly displays it"""
     if verbose == 1 and type(element) == dict:
         print("=== {} ===\n\n".format(element['title']))
         for (key, value) in sorted(element.items(), key=op.itemgetter(0)):

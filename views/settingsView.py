@@ -6,7 +6,7 @@ import math
 
 
 def set_NCpl_settings():
-
+    """Provides the view for the user setting of the NumberCouple experiments and returns the settings set"""
     options = {}
     os.system("clear")
 
@@ -140,6 +140,7 @@ def set_NCpl_settings():
 
 
 def set_AklI_settings():
+    """Provides the view for the user setting of the Ackley experiments and returns the settings set"""
     os.system("clear")
     print(
         "---> Ackley Function Individual\n"
@@ -219,7 +220,6 @@ def set_AklI_settings():
             options['sigmaBoost'] = True
         elif options['sigmaBoost'] == 2:
             options['sigmaBoost'] = False
-
 
         print("\nVERBOSE")
         options["verbose"] = int(raw_input(

@@ -6,17 +6,29 @@ import random
 
 
 class NumberCouple(Individual):
-    """NumberCouple class
+    """NumberCouple class: represent one couple of real individual, inherits from the Individual class
 
-    Attributes:
-    _key : is a list(x1, x2)
-    _fitness : = 1/1+f(x) with f(x) = 100(x2 - x1^2)^2 + (x1 - 1)^2
+    Properties:
+    key : standardized representation of the problem [[x1, 'real'][x2, 'real']]
+    fitness : = 1/1+f(x) with f(x) = 100(x2 - x1^2)^2 + (x1 - 1)^2
+    + every property from the Individual class
 
+    Methods:
+    __init__()
+    get_binary_standard()
+    get_real_standard()
+    get_binary_unstandardized()
+    get_real_unstandardized
+    _calcul_fitness()
+    _random_initialisation()
+    + every method from the Individual Class
     """
     def __init__(self, key=None):
+        """Class constuctor"""
         super(NumberCouple, self).__init__(key)
 
     def _random_initialisation(self):
+        """Randomly initialises an individual, Returns  a random key"""
         key = list()
         for i in range(0, 2):
             x = random.uniform(-2.048, 2.048)
@@ -24,14 +36,16 @@ class NumberCouple(Individual):
         return key
 
     def _calcul_fitness(self):
-            x1, x2 = self._key
-            x1 = x1[0]
-            x2 = x2[0]
-            functionResult = 100 * pow((x2 - pow(x1, 2)), 2) + pow((x1 - 1), 2)
-            fitness = 1.0 / (1 + functionResult)
-            return fitness
+        """Calculates the individuals fitness"""
+        x1, x2 = self._key
+        x1 = x1[0]
+        x2 = x2[0]
+        functionResult = 100 * pow((x2 - pow(x1, 2)), 2) + pow((x1 - 1), 2)
+        fitness = 1.0 / (1 + functionResult)
+        return fitness
 
     def get_binary_standard(self):
+        """Returns the standardised representation of the key for binary manipulations"""
         x1, x2 = self.key
         x1 = 1000 * x1[0]
         x2 = 1000 * x2[0]
@@ -41,6 +55,7 @@ class NumberCouple(Individual):
         return result
 
     def get_real_standard(self):
+        """Returns the standardised representation of the key for real manipulations"""
         x1, x2 = self.key
         x1 = 1000 * x1[0]
         x2 = 1000 * x2[0]
@@ -51,6 +66,7 @@ class NumberCouple(Individual):
 
     @staticmethod
     def get_binary_unstandardized(l):
+        """Returns the unstandardisation of a standardised binary representation of the key"""
         key = list()
         for element in l:
             a = int(element, 2)
@@ -60,6 +76,7 @@ class NumberCouple(Individual):
 
     @staticmethod
     def get_real_unstandardized(l):
+        """Returns the unstandardisation of a real binary representation of the key"""
         key = list()
         for element in l:
             a = int(element)
