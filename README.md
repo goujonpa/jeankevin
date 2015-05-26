@@ -25,8 +25,14 @@ Please note that I've chosen to do that Object python in order to learn the lang
 ### GA
 -> Binary and Real implementation
 
+Selections:
+- Roulette
+- Roulette without replacement
+- Tournament
+
 Crossovers:
 - One point, random
+- Multipoint, random
 
 Mutations:
 - Swap
