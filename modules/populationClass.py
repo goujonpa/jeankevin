@@ -13,13 +13,72 @@ import os
 
 
 class Population(object):
-    """
-    docstring for Population
+    """Population class : contains several individuals and is able to apply a lot of action on them
+
+    Properties:
+    maximal_population
+    best
+    population
+    population size
+    parent
+    fitness_sums
+    min_fitness
+    max_fitness
+    global_learning_rate
+    local_learning_rate
+    settings
+    individuals_type
+    child_number
+    verbose
+    stop_iteration
+    stop_fitness
+    initial_population
+    mutation_mode
+    mutation_probability
+    mode
+    crossmode
+    selection_mode
+    sigma_boost
+    sigma_count
+    current_iteration
+    view
+
+    Methods:
+    _empty_population()
+    _empty_extrems()
+    _initSettings()
+    enable_verbose()
+    disable_verbose()
+    addview()
+    empty_view()
+    display()
+    _initialise()
+    run_GA()
+    _store()
+    _selectOne()
+    _roulette_selection()
+    _crossover()
+    _cross_random_one_point()
+    _mutation_GA()
+    _mutation_GA_swap()
+    _mutation_GA_every_nucleotid()
+    _mutation_GA_one_nucleotid()
+    run_ES()
+    _recombination_ES()
+    _recombination_ES_intermediate()
+    _recombination_ES_weighted()
+    _recombination_ES_best()
+    _mutation_ES()
+    _mutation_ES_2LRNS()
+    _mutation_ES_1LR1S()
+
     """
 
     # ========== CONSTRUCTOR ==========
 
     def __init__(self, individuals_type):
+        """Constructor"""
+
         super(Population, self).__init__()
         self._individuals_type = individuals_type
         self._settings = self._initSettings()
@@ -41,32 +100,39 @@ class Population(object):
 
     @property
     def maximal_population(self):
+        """Returns the maximal number of individuals"""
         return self._settings['maximalPopulation']
 
     def _empty_population(self):
+        """Empties the population list"""
         self._empty_extrems()
         self._population = list()
 
     @property
     def best(self):
+        """Returns best individual"""
         return self._best
 
     @property
     def population(self):
+        """Returns the population list"""
         return self._population
 
     @property
     def population_size(self):
+        """Returns the population list size"""
         return len(self._population)
 
     @property
     def parent(self):
+        """Returns the individual with index [0][0] in the population"""
         return self.population[0][0]
 
     # ----- Fitness
 
     @property
     def fitness_sums(self):
+        """Returns the sum of all fitnesses from the population"""
         population = self.population
         sums = 0.0
         individuals, values = zip(*self.population)
@@ -75,17 +141,20 @@ class Population(object):
 
     @property
     def min_fitness(self):
+        """Returns the fitness of the worst individual"""
         if self._worst is None:
             return None
         return self._worst.fitness
 
     @property
     def max_fitness(self):
+        """Returns the fitness of the best individual"""
         if self._best is None:
             return None
         return self._best.fitness
 
     def _empty_extrems(self):
+        """Empties best and worst individuals records"""
         self._best = None
         self._worst = None
 
@@ -93,19 +162,23 @@ class Population(object):
 
     @property
     def global_learning_rate(self):
+        """Returns the global learning rate"""
         return self._settings['globalLearningRate']
 
     @property
     def local_learning_rate(self):
+        """Returns the local learning rate"""
         return self._settings['localLearningRate']
 
     # ----- Settings
 
     @property
     def settings(self):
+        """Returns the settings set"""
         return self._settings
 
     def _initSettings(self):
+        """Use the settingsView to initialise population settings"""
         if self.individuals_type == 'NumberCouple':
             return vSet.set_NCpl_settings()
         elif self.individuals_type == 'AckleyIndividual':
@@ -113,79 +186,99 @@ class Population(object):
 
     @property  # Could be incorporated to settings
     def individuals_type(self):
+        """Returns the type of individuals composing the population"""
         return self._individuals_type
 
     @property
     def child_number(self):
+        """Returns the number of childs maximal for a generation (Useful for ES mutation)"""
         return self._settings['childNumber']
 
     @property
     def verbose(self):
+        """Returns the verbose setting"""
         return self._settings['verbose']
 
     @property
     def stop_iteration(self):
+        """Returns the maximal number of iterations (for GA and ES)"""
         return self._settings['iterations']
 
     @property
     def initial_population(self):
+        """Returns the number of individuals used to initialise the population"""
         return self._settings['initialPopulation']
 
     @property
     def stop_fitness(self):
+        """Returns the fitness to reach to stop the algorithm (GA or ES)"""
         return self._settings['stopFitness']
 
     @property
     def mutation_mode(self):
+        """Returns the mutation mode setting"""
         return self._settings['mutationMode']
 
     @property
     def mutation_probability(self):
+        """Returns the mutation probability setting"""
         return self._settings['mutationProbability']
 
     @property
     def mode(self):
+        """Returns the mode : binary or real"""
         return self._settings['mode']
 
     @property
     def crossmode(self):
+        """Returns the crossover mode"""
         return self._settings['crossMode']
 
     @property
     def selection_mode(self):
+        """Returns the individuals selection mode"""
         return self._settings['selectionMode']
 
     @property
     def recombination_mode(self):
+        """Returns the recombination mode"""
         return self._settings['recombinationMode']
 
     @property
     def sigma_boost(self):
+        """Returns the value of the sigmaboost setting"""
         return self._settings['sigmaBoost']
 
     @property
     def sigma_count(self):
+        """Returns the sigma boost counter"""
         return self._sigma_count
 
-    def enable_verbose(self):
+    def _enable_verbose(self):
+        """Enables verbose mode"""
         self._settings['verbose'] = True
 
-    def disable_verbose(self):
+    def _disable_verbose(self):
+        """Disables verbose mode"""
         self._settings['verbose'] = False
 
     # ----- View
 
     @property
     def view(self):
+        """Returns the view dictionary"""
         return self._view
 
     def addview(self, key, value):
+        """Adds an entry to the view dictionary"""
         self._view[key] = value
 
     def empty_view(self):
+        """Empties the view dictionary"""
         self._view = dict()
 
     def display(self, element=None, verbose=True):
+        """Sends the view dictionary to the displayView to display informations"""
         if element is None:
             v.display(self._view, self.verbose, (self.current_iteration, self.stop_iteration))
         else:
@@ -195,14 +288,16 @@ class Population(object):
 
     @property
     def current_iteration(self):
+        """Returns the number of the current_iteration"""
         return self._current_iteration
 
     # ========== GA & ES Algorithms ==========
 
     def _initialise(self):  # could be more generic
+        """Initialise the population in function of the chosen individuals type"""
         verbose = False
         if self.verbose is True:
-            self.disable_verbose()
+            self._disable_verbose()
             verbose = True
         if self.individuals_type == 'NumberCouple':
             for i in range(0, self.initial_population):
@@ -215,10 +310,11 @@ class Population(object):
             adam = AckleyIndividual()
             result = self._store(adam)
         if verbose is True:
-            self.enable_verbose()
+            self._enable_verbose()
         os.system('clear')
 
     def run_GA(self):
+        """Runs the Genetic Algorithm until stop_iteration or stop_fitness is reached"""
         result = (1, 1)
         i = 0
         self._save_iterations.append(i)
@@ -247,6 +343,7 @@ class Population(object):
         vSave.save_figure(self._save_iterations, mesures, 'simuGA')
 
     def _store(self, newIndividual):
+        """Stores an individual into the population list, can apply elitism"""
         self.empty_view()
         self.addview('title', 'INDIVIDUAL STORAGE')
 
@@ -282,12 +379,14 @@ class Population(object):
             return 1
 
     def _selectOne(self):
+        """Selects one individual, in function of the selection_mode chosen"""
         if self.selection_mode == 'roulette':
             return self._roulette_selection()
         elif self.selection_mode == 'turnament':
             return self._tournament_selection()
 
     def _roulette_selection(self):
+        """Returns one individual, selected with the roulette wheel algorithm"""
         self.empty_view()
         self.addview('title', 'SELECTION BY ROULETTE WHEEL')
 
@@ -317,6 +416,7 @@ class Population(object):
         return individual
 
     def _crossover(self, parent1, parent2):
+        """Crosses two individuals, in function of the crossmode chosen"""
         self.empty_view()
         self.addview('title', 'CROSSOVER')
 
@@ -357,6 +457,7 @@ class Population(object):
         return (child1, child2)
 
     def _cross_random_one_point(self, standard_parent1, standard_parent2):
+        """Provides two child crossing two parents with the one random point crossover algorithm"""
         length1 = len(standard_parent1)
         length2 = len(standard_parent2)  # if difference, exception
 
@@ -385,7 +486,8 @@ class Population(object):
 
         return (child1, child2)
 
-    def _mutation_GA(self, child):  # Add display !!!
+    def _mutation_GA(self, child):
+        """Mutates one child in function of the mutation_mode chosen"""
         self.empty_view()
         self.addview('title', 'MUTATION')
         self.addview('0- Individual', child.key)
@@ -443,6 +545,7 @@ class Population(object):
         return child
 
     def _mutation_GA_swap(self, string, size, min_position, max_position, mutation_probability):
+        """Applies a mutation to a child by swaping two nucleotids"""
         a = 0
         b = 0
         while a >= b:
@@ -452,6 +555,7 @@ class Population(object):
         return string
 
     def _mutation_GA_every_nucleotid(self, string, size, min_position, max_position, mutation_probability, crossmode):
+        """Applies n mutations to a child, on n nucleotids, with a fixed probability"""
         for i in range(min_position, max_position):
             pick = random.uniform(0, 1)
             if pick < mutation_probability:
@@ -466,6 +570,7 @@ class Population(object):
         return string
 
     def _mutation_GA_one_nucleotid(self, string, size, min_position, max_position, mutation_probability, crossmode):
+        """Applies 1 mutation maximum to 1 nucleotid of a child, with a fixed probability"""
         pick = random.uniform(0, 1)
         if pick < mutation_probability:
             i = random.randint(min_position, max_position)
@@ -480,7 +585,7 @@ class Population(object):
         return string
 
     def run_ES(self):
-        # Initialisation done by initialise()
+        """Runs the Evolutionary Strategy algorithm"""
         i = 0
         mesures = dict()
 
@@ -516,6 +621,7 @@ class Population(object):
         vSave.save_figure(self._save_iterations, mesures, 'simuES')
 
     def _recombination_ES(self):
+        """Recombinates n childs into one new parent in function of the recombination_mode chosen"""
         if self.recombination_mode == 'intermediate':
             self._recombination_ES_intermediate()
         elif self.recombination_mode == 'best':
@@ -524,6 +630,7 @@ class Population(object):
             self._recombination_ES_weighted()
 
     def _recombination_ES_intermediate(self):
+        """Recombinates n children into one new parent, using the intermediate recombination algorithm"""
         self.empty_view()
         self.addview('title', 'RECOMBINATION INTERMEDIATE')
         population = self.population
@@ -548,7 +655,8 @@ class Population(object):
         result = self._store(new_father)
         self.display()
 
-    def _recombination_ES_weighted(self):  # TO IMPLEMENT MG
+    def _recombination_ES_weighted(self):
+        """Recombinates n children into one new parent, using the weighted recombination algorithm"""
         self.empty_view()
         self.addview('title', 'RECOMBINATION WEIGHTED')
         population = self.population
@@ -573,6 +681,7 @@ class Population(object):
         self.display()
 
     def _recombination_ES_best(self):
+        """Selects the best from n children, which will be the new parent"""
         self.empty_view()
         self.addview('title', 'RECOMBINATION BEST')
         best = self.best
@@ -583,12 +692,14 @@ class Population(object):
         self.display()
 
     def _mutation_ES(self):
+        """Creates n children from a common father using mutation in function of the mutation_mode chosen"""
         if self.mutation_mode == '1LR1S':
             self._mutation_ES_1LR1S()
         elif self.mutation_mode == '2LRNS':
             self._mutation_ES_2LRNS()
 
-    def _mutation_ES_2LRNS(self):  # pretty weird results....????!
+    def _mutation_ES_2LRNS(self):
+        """Creates n children from a common father using the 2LRNS mutation"""
         self.empty_view()
         self.addview('title', 'MUTATION 2LRNS')
         individual = self.parent
@@ -622,6 +733,7 @@ class Population(object):
             self.addview('title', 'MUTATION 1LR1S')
 
     def _mutation_ES_1LR1S(self):
+        """Creates n children from a common father using the 1LR1S mutation"""
         self.empty_view()
         self.addview('title', 'MUTATION 1LR1S')
         individual = self.parent
