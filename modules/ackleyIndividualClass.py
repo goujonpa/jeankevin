@@ -10,11 +10,27 @@ class AckleyIndividual(Individual):
     """Ackley Individual class : represents one ackley individual, inherits from Individual class
 
     Properties:
-    _key : is a list(x1, x2)
-    _fitness : = 1/1+f(x) with f(x) = 100(x2 - x1^2)^2 + (x1 - 1)^2
+    key : standardized representation of the problem [[x1, 'real']...[xn, 'real'], [sig1, 'real']...[sign, 'real']]
+    fitness : = 1/1+f(x) with f(x) = result of the ackley function
+    c3
+    c2
+    c1
+    dimension
+    + every properties from the Individual Class
 
+    Methods:
+    __init__()
+    get_binary_standard()
+    get_real_standard()
+    get_binary_unstandardized()
+    get_real_unstandardized
+    _calcul_fitness()
+    _random_initialisation()
+    + every method from the Individual Class
     """
+
     def __init__(self, key=None):
+        """Class constructor"""
         self._c1 = float(20)
         self._c2 = float(0.2)
         self._c3 = float(2.0 * 3.14159)
@@ -23,37 +39,46 @@ class AckleyIndividual(Individual):
 
     @property
     def c3(self):
+        """Returns the c3 parameter of the Ackley function"""
         return self._c3
 
     @property
     def c1(self):
+        """Returns the c1 parameter of the Ackley function"""
         return self._c1
 
     @property
     def c2(self):
+        """Returns the c2 parameter of the Ackley function"""
         return self._c2
 
     @property
     def dimension(self):
+        """Returns the dimension parameter of the Ackley function"""
         return self._dimension
 
     def get_binary_standard(self):
+        """Implemented soon"""
         # pour tous les x : * 1000 comme dhab, fixer les chiffres
         # pour tous les lambda : idem
         return None
 
     def get_real_standard(self):
+        """Soon"""
         return None
 
     @staticmethod
     def get_binary_unstandardized(l):
+        """Soon"""
         return None
 
     @staticmethod
     def get_real_unstandardized(l):
+        """Soon"""
         return None
 
     def _random_initialisation(self):
+        """Randomly initialises an AckleyIndividual"""
         key = list()
         for i in range(0, self.dimension):
             random_real = random.uniform(-15.0, 15.0)
@@ -65,6 +90,7 @@ class AckleyIndividual(Individual):
         return key
 
     def _calcul_fitness(self):
+        """Returns the fitness of the individual"""
         calcul = 0.0
         calcul2 = 0.0
         agregat = 0.0

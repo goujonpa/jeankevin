@@ -7,7 +7,6 @@ import random
 
 class NumberCouple(Individual):
     """NumberCouple class
-    Inherits from Individual class
 
     Attributes:
     _key : is a list(x1, x2)

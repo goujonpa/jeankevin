@@ -45,6 +45,7 @@ class Population(object):
     remise
 
     Methods:
+    __init__()
     _empty_population()
     _empty_extrems()
     _initSettings()
