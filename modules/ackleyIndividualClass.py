@@ -39,6 +39,8 @@ class AckleyIndividual(Individual):
         return self._dimension
 
     def get_binary_standard(self):
+        # pour tous les x : * 1000 comme dhab, fixer les chiffres
+        # pour tous les lambda : idem
         return None
 
     def get_real_standard(self):

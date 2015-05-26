@@ -385,6 +385,19 @@ class Population(object):
         elif self.selection_mode == 'turnament':
             return self._tournament_selection()
 
+    def _tournament_selection():
+        # sorted_pop = sorted(pop)
+        # best = en haut
+        # population = le reste
+        # return le best (A REMETTRE DANS LA POPULATION IMMEDIATEMENT APRES SELECTION DES DEUX DANS LE MAIN)
+        return 1
+
+    def _roulette_without_replacement():
+        # roulette
+        # pop
+        # replacement après coup
+        return 1
+
     def _roulette_selection(self):
         """Returns one individual, selected with the roulette wheel algorithm"""
         self.empty_view()
@@ -485,6 +498,12 @@ class Population(object):
             child2.append(string2)
 
         return (child1, child2)
+
+    def _cross_random_multipoint():
+        # parcourir string
+        # a chaque avancée : switch ? oui ? non ?
+        # puis déstandardiser
+        return 1
 
     def _mutation_GA(self, child):
         """Mutates one child in function of the mutation_mode chosen"""
