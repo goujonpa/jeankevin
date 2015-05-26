@@ -160,12 +160,12 @@ def set_AklI_settings():
 
     if preset == 1:
         options["iterations"] = int(1000)
-        options["stopFitness"] = float(0.99)
+        options["stopFitness"] = float(0.95)
         options["base"] = int(10)
         options['verbose'] = False
         options['selectionMode'] = int(1)
         options['mutationMode'] = '2LRNS'
-        options['recombinationMode'] = 'intermediate'
+        options['recombinationMode'] = 'weighted'
         options['sigmaBoost'] = True
 
     elif preset == 2:
