@@ -77,7 +77,7 @@ class AckleyIndividual(Individual):
         for element in l:
             a = int(element, 2)
             a = a / 1000.0
-            key.append((a, 'real'))
+            key.append((a, 'x'))
         return key
 
     @staticmethod
@@ -87,7 +87,7 @@ class AckleyIndividual(Individual):
         for element in l:
             a = int(element)
             a = a / 1000.0
-            key.append((a, 'real'))
+            key.append((a, 'x'))
         return key
 
     def _random_initialisation(self):

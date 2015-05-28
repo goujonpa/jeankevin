@@ -5,15 +5,12 @@ import os
 import math
 
 
-def set_NCpl_settings():
-    """Provides the view for the user setting of the NumberCouple experiments and returns the settings set"""
+def GA_settings():
+    """Provides the view for the user setting of the GA experiments and returns the settings set"""
     options = {}
     os.system("clear")
 
-    print(
-        "---> NumberCouple Individual\n"
-        "\n===== OPTIONS =====\n"
-    )
+    print('===== OPTIONS =====\n')
 
     preset = int(raw_input(
         "PRESET\n"
@@ -40,9 +37,7 @@ def set_NCpl_settings():
 
         print('BASICS')
 
-        x = int(raw_input(
-            'Stop Iterations Number:\n'
-        ))
+        x = int(raw_input('Stop Iterations Number:\n'))
         options['iterations'] = int(x)
         options['stopFitness'] = float(raw_input(
             'Stop Fitness:\n'
@@ -139,13 +134,10 @@ def set_NCpl_settings():
     return options
 
 
-def set_AklI_settings():
-    """Provides the view for the user setting of the Ackley experiments and returns the settings set"""
+def ES_settings():
+    """Provides the view for the user setting of the ES experiments and returns the settings set"""
     os.system("clear")
-    print(
-        "---> Ackley Function Individual\n"
-        "\n===== OPTIONS =====\n"
-    )
+    print('===== OPTIONS =====\n')
 
     options = {}
 
@@ -171,7 +163,7 @@ def set_AklI_settings():
     elif preset == 2:
         print('\nBASICS')
         x = int(raw_input('Stop Iterations Number:\n'))
-        options["iterations"] = int(x) - 1
+        options["iterations"] = int(x)
 
         options['stopFitness'] = float(raw_input('\nStop Fitness:\n'))
 

@@ -186,11 +186,11 @@ class Population(object):
     def _initSettings(self):
         """Use the settingsView to initialise population settings"""
         if self.individuals_type == 'NumberCouple':
-            return vSet.set_NCpl_settings()
+            return vSet.GA_settings()
         elif self.individuals_type == 'AckleyIndividual':
-            return vSet.set_AklI_settings()
+            return vSet.ES_settings()
         elif self.individuals_type == 'AckleyIndividualGA':  # TO CHANGE
-            return vSet.set_NCpl_settings()
+            return vSet.GA_settings()
 
     @property  # Could be incorporated to settings
     def individuals_type(self):
@@ -739,9 +739,9 @@ class Population(object):
         for (individual, fitness) in population:
             for i in range(0, key_length):
                 if len(new_key) <= i and i < (key_length / 2):
-                    new_key.append([individual.key[i][0], 'ackley_x'])
+                    new_key.append([individual.key[i][0], 'x'])
                 elif len(new_key) <= i:
-                    new_key.append([individual.key[i][0], 'ackley_sigma'])
+                    new_key.append([individual.key[i][0], 'sigma'])
                 else:
                     new_key[i][0] += individual.key[i][0]
 
@@ -750,8 +750,8 @@ class Population(object):
         self.addview('New individual sigmas', [x for (x, y) in new_key[(len(new_key) / 2):]])
         new_father = AckleyIndividual(new_key)
         self._empty_population()
-        result = self._store(new_father)
         self.display()
+        result = self._store(new_father)
 
     def _recombination_ES_weighted(self):
         """Recombinates n children into one new parent, using the weighted recombination algorithm"""
@@ -764,9 +764,9 @@ class Population(object):
         for (individual, fitness) in population:
             for i in range(0, key_length):
                 if len(new_key) <= i and i < (key_length / 2):
-                    new_key.append([(individual.key[i][0] * individual.fitness), 'ackley_x'])
+                    new_key.append([(individual.key[i][0] * individual.fitness), 'x'])
                 elif len(new_key) <= i:
-                    new_key.append([(individual.key[i][0] * individual.fitness), 'ackley_sigma'])
+                    new_key.append([(individual.key[i][0] * individual.fitness), 'sigma'])
                 else:
                     new_key[i][0] += (individual.key[i][0] * individual.fitness)
 
@@ -775,8 +775,8 @@ class Population(object):
         self.addview('New individual sigmas', [x for (x, y) in new_key[(len(new_key) / 2):]])
         new_father = AckleyIndividual(new_key)
         self._empty_population()
-        result = self._store(new_father)
         self.display()
+        result = self._store(new_father)
 
     def _recombination_ES_best(self):
         """Selects the best from n children, which will be the new parent"""
@@ -786,8 +786,8 @@ class Population(object):
         self.addview('Best', best.key)
         self.addview('Fitness', best.fitness)
         self._empty_population()
-        self._store(best)
         self.display()
+        self._store(best)
 
     def _mutation_ES(self):
         """Creates n children from a common father using mutation in function of the mutation_mode chosen"""
@@ -816,9 +816,9 @@ class Population(object):
                 local_step_size = float(random.gauss(0, 1) * self.local_learning_rate)
                 sigma = float(individual.key[30+j][0])
                 sigma = sigma * float(math.exp(global_step_size + local_step_size))
-                list_sigma.append((sigma, 'ackley_sigma'))
+                list_sigma.append((sigma, 'sigma'))
                 xi = float(individual.key[j][0]) + float(sigma * random.gauss(0, 1))
-                list_xi.append((xi, 'ackley_x'))
+                list_xi.append((xi, 'x'))
 
             new_key = list_xi + list_sigma
             self.addview('2- New child xs', [x for (x, y) in list_xi])
@@ -828,7 +828,7 @@ class Population(object):
             self.display()
             self._store(new_individual)
             self.empty_view()
-            self.addview('title', 'MUTATION 1LR1S')
+            self.addview('title', 'MUTATION 2LRNS')
 
     def _mutation_ES_1LR1S(self):
         """Creates n children from a common father using the 1LR1S mutation"""
@@ -850,9 +850,9 @@ class Population(object):
             for j in range(0, dimension):
                 sigma = float(individual.key[30+j][0])
                 sigma = sigma * float(math.exp(global_step_size))
-                list_sigma.append((sigma, 'ackley_sigma'))
+                list_sigma.append((sigma, 'sigma'))
                 xi = float(individual.key[j][0]) + float(sigma * random.gauss(0, 1))
-                list_xi.append((xi, 'ackley_x'))
+                list_xi.append((xi, 'x'))
 
             new_key = list_xi + list_sigma
             self.addview('2- New child xs', [x for (x, y) in list_xi])
