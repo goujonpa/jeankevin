@@ -1,0 +1,19 @@
+standardchild <- child.getstandardised()
+mutated_child <- []
+
+for (string, size, min_position, max_position) in standardchild do:
+    mutation_probability <- set_probability()
+
+    for i in range(min_position, max_position) do:
+        pick <- random.uniform(0, 1)
+        if pick < mutation_probability do:
+            string[i].mutate
+        endif
+    endfor
+
+    mutated_child.append(string)
+endfor
+
+mutated_child <- getunstandardised(mutated_child)
+mutated_child <- AckleyIndividual(mutated_child)
+

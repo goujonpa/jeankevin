@@ -1,0 +1,10 @@
+
+new_key <- []
+for (individual, fitness) in population do:
+    for (value, type) in key do:
+        sum_(value * fitness)_to_component_at_index_i(sumlist)
+    endfor
+endfor
+new_key <- divide_each_component_by_fitness_sum(sumlist)
+new_father <- AckleyIndividual(new_key)
+

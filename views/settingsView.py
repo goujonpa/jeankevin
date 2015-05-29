@@ -111,6 +111,8 @@ def GA_settings():
             "Maximal Population:\n"
             "-> n > 0: elitist insertion, just keep n best individuals\n"
             "-> Other: every individual is kept (can slow down the algorythm for several iterations)\n"
+            "-> WARNING: If you set maximal population = 1 WITH roulette without replacement"
+            ", your computer will explode\n"
         ))
 
         options["initialPopulation"] = int(raw_input("Initialise with how much individuals ?\n"))
