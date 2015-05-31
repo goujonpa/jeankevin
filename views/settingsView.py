@@ -28,7 +28,7 @@ def GA_settings():
         options['crossMode'] = 'randomMultiPoint'
         options["maximalPopulation"] = int(50)
         options["mutationMode"] = 'oneNucleotid'
-        options["mutationProbability"] = float(2)
+        options["mutationProbability"] = float(0.25)
         options["verbose"] = False
         options["initialPopulation"] = int(100)
         options['selectionMode'] = 'tournament'
